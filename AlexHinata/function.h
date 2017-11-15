@@ -1,6 +1,6 @@
 #ifndef _FUNCTION_
 #define _FUNCTION_
-
+#include <string.h>
 /*	reverse bit	*/
 /*	LSB -> MSB	*/
 int BitScanReverse(U32 board);
@@ -29,6 +29,11 @@ U32 BishopMove_h (fighter board, int pos, int turn);
 
 /*	bit scan	*/
 int BitScan(U32 *board);
+
+/*  board position to index  */
+int boardpos2index(char row, char col);
+
+bool index2boardpos(int index, char* pos);
 
 /*	print	*/
 void PrintBoard (U32 Board);

@@ -1,4 +1,5 @@
 #include "head.h"
+#include "main.h"
 
 int main (int argc, char *argv[])
 {
@@ -75,7 +76,8 @@ int main (int argc, char *argv[])
 	_flushall();
 	int player;
     scanf_s("%d", &player); getchar();
-	if (player != WHITE && player != BLACK && player != SPEC) return 0;
+	if (player != WHITE && player != BLACK && player != SPEC)
+		return 0;
 	
 	double elapsed_secs = 0, accumulate = 0;
 	while(true) {
@@ -85,8 +87,18 @@ int main (int argc, char *argv[])
             _flushall();
 
 			int src = 0, dst = 0, eat = 0, pro = 0;
-			fscanf_s(stdin, "%d %d %d", &src, &dst, &pro);
-			if (chessboard[dst]) eat = 1;
+			char srcStr[2], dstStr[2];
+			fscanf_s(stdin, "%2c", &srcStr);
+			fscanf_s(stdin, " %2c", &dstStr);
+			fscanf_s(stdin, " %d", &pro);
+			src = boardpos2index(toupper(srcStr[0]), srcStr[1]);
+			dst = boardpos2index(toupper(dstStr[0]), dstStr[1]);
+			if (src == -1 || dst == -1 || pro > 1 || pro < 0) {
+				fscanf_s(stdout, "Input Error\n");
+				continue;
+			}
+			if (chessboard[dst]) 
+				eat = 1;
 			movebuf = (pro << 13) | (eat << 12) | (dst << 6) | src;
             DoMove(movebuf, &board, chessboard, player);
             PrintChessBoard(chessboard);

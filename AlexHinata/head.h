@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <time.h>
 #include <direct.h>
+#include <ctype.h>
 #include "define.h"
 #include "change.h"
 #include "library.h"

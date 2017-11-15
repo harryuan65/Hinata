@@ -74,14 +74,16 @@ inline void SetColor(int color = 7)
 
 
 void PrintPV(line path, U32 from, U32 to) {
-	for (U32 i = from; i < to; ++i)
-		printf("%2d : %2d -> %2d eat: %s pro: %s , %s\n",
-			i,
-			path.pv[i] & SRC_MASK,
-			(path.pv[i] & DST_MASK) >> 6,
+	char src[3] = "  ", dst[3]= "  ";
+	for (U32 i = from; i < to; ++i) {
+		index2boardpos(path.pv[i] & SRC_MASK, src);
+		index2boardpos((path.pv[i] & DST_MASK) >> 6, dst);
+		printf("%2d : %s -> %s Eat: %s Pro: %s , %s\n",
+			i, src, dst,
 			(path.pv[i] & EAT_MASK) ? "Y" : "N",
 			(path.pv[i] >> 13) ? "Y" : "N",
-			(i & 1) ? "white" : "black");
+			(i & 1) ? "White" : "Black");
+	}
 }
 
 void PrintChessBoard(int *chessboard)
@@ -114,7 +116,7 @@ void PrintChessBoard(int *chessboard)
 	puts("¡U");
 	for (int i = 0; i < 9; i++)
 	{
-		puts("¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X\t ¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U");
+		puts("¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X");
 		if (i == 5)
 		{
 			printf("%2s¡U", " ");  //*
@@ -239,7 +241,7 @@ void PrintChessBoard(int *chessboard)
 		printf("¡U");
 		SetColor(15);
 		printf("%2s", rank_name[rank_count++]);//*
-		SetColor();
+		/*SetColor();
 		printf("\t ");
 		int temp = board_count - 1;
 		for (int j = temp - 4; j <= temp; j++)
@@ -250,9 +252,26 @@ void PrintChessBoard(int *chessboard)
 			SetColor();
 		}
 		printf("¡U");
+		*/
 		puts(" ");		//*
 	}
 	puts(" ");			//*
 
 	return;
+}
+
+int boardpos2index(char row, char col) {
+	if ((int)row >= (int)'A' && (int)row <= (int)'I' && col >= '1' && col <= '5') {
+		return (int)(row - 'A') * 5 + 4 - col + '1';
+	}
+	return -1;
+}
+
+bool index2boardpos(int index, char* pos) {
+	if (index >= 0 && index <= 44) {
+		pos[0] = 'A' + (int)(index / 5);
+		pos[1] = '1' + 4 - index % 5;
+		return true;
+	}
+	return false;
 }

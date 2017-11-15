@@ -148,6 +148,7 @@
     <ClInclude Include="function.h" />
     <ClInclude Include="head.h" />
     <ClInclude Include="library.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="move.h" />
   </ItemGroup>
   <ItemGroup>

@@ -128,6 +128,7 @@ typedef struct line_t
 	U16 pv[LIMIT_DEPTH + 1];
 }line;
 
+
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)
 
