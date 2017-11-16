@@ -1,0 +1,6 @@
+﻿  print bit board.cpp
+  main.cpp
+d:\大三\專題\alex\alexhinata\alexhinata\main.cpp(83): warning C4101: 'movestr': 未參考的區域變數
+  正在產生程式碼...
+  AlexHinata.vcxproj -> D:\大三\專題\Alex\AlexHinata\Debug\AlexHinata.exe
+  AlexHinata.vcxproj -> D:\大三\專題\Alex\AlexHinata\Debug\AlexHinata.pdb (Full PDB)
