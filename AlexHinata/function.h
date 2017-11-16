@@ -31,8 +31,8 @@ U32 BishopMove_h (fighter board, int pos, int turn);
 int BitScan(U32 *board);
 
 /*  board position to index  */
+void SetFighter(fighter& mFighter, int* mBoard);
 int boardpos2index(char row, char col);
-
 bool index2boardpos(int index, char* pos);
 
 /*	print	*/
@@ -58,7 +58,7 @@ int AlphaBetaMin (line *pline, fighter *board, int *chessboard, int alpha, int b
 int NegaMax      (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth);
 int ScoutMax     (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth);
 int ScoutMin     (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth);
-int NegaScout    (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth);
+int NegaScout    (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth, bool isFailHigh);
 int QuiescenceSearch (fighter *board, int *chessboard, int alpha, int beta, int turn);
 bool Uchifuzume_Searching (fighter *board, int *chessboard, int turn, int depth);
 

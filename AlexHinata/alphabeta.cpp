@@ -1,6 +1,9 @@
 #include "head.h"
 
 //U64 max_move = 0;
+U64 failed_nodes;
+U64 leave_nodes;
+int pv_chessboard[CHESS_BOARD_SIZE];
 
 int NegaMax (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth)
 {
@@ -14,6 +17,7 @@ int NegaMax (line *pline, fighter *board, int *chessboard, int alpha, int beta, 
 	if (depth == 0)
 	{
 		pline->pv_count = 0;
+		leave_nodes++;
 		//return (LIMIT_DEPTH & 1) ? -Evaluate(chessboard) : Evaluate(chessboard); // evaluating function
 		return QuiescenceSearch(board, chessboard, alpha, beta, turn);
 	}
@@ -22,13 +26,13 @@ int NegaMax (line *pline, fighter *board, int *chessboard, int alpha, int beta, 
 	U16 movelist[MAX_MOVE_NUM] = {0};
 	int cnt = Generator(*board, movelist, turn);
     ++nodes;
-    total_branch += cnt;
+    //total_branch += cnt;
     //if (cnt > max_move)
     //    printf("%d ", (max_move = cnt));
 
 	for (int i = 0; i < cnt; i++)
 	{
-        ++search_branch;
+        //++search_branch;
 		U16 capture = DoMove(movelist[i], board, chessboard, turn);
 		int score = -NegaMax(&path, board, chessboard, -beta, -max(alpha, bestscore), 1 - turn, depth - 1);
 		if (score > bestscore)

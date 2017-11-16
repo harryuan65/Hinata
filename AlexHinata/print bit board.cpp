@@ -260,6 +260,206 @@ void PrintChessBoard(int *chessboard)
 	return;
 }
 
+void SetFighter(fighter& mFighter, int* mBoard) {
+	for (int i = 0; i < CHESS_BOARD_SIZE; i++) {
+		if (mBoard[i] == BLANK) {
+			continue;
+		}
+		if (mBoard[i] > 16) // black
+		{
+			if (i < BOARD_SIZE) // board
+			{
+				switch (mBoard[i])
+				{
+				case (KING | 0x10):
+				{
+					mFighter.b_king |= 1 << i;
+					break;
+				}
+				case (GOLD | 0x10):
+				{
+					mFighter.b_gold |= 1 << i;
+					break;
+				}
+				case (SILVER | 0x10):
+				{
+					mFighter.b_silver |= 1 << i;
+					break;
+				}
+				case (PAWN | 0x10):
+				{
+					mFighter.b_pawn |= 1 << i;
+					break;
+				}
+				case (BISHOP | 0x10):
+				{
+					mFighter.b_bishop |= 1 << i;
+					break;
+				}
+				case (ROOK | 0x10):
+				{
+					mFighter.b_rook |= 1 << i;
+					break;
+				}
+				case (eSILVER | 0x10):
+				{
+					mFighter.b_e_silver |= 1 << i;
+					break;
+				}
+				case (ePAWN | 0x10):
+				{
+					mFighter.b_e_pawn |= 1 << i;
+					break;
+				}
+				case (eBISHOP | 0x10):
+				{
+					mFighter.b_e_bishop |= 1 << i;
+					break;
+				}
+				case (eROOK | 0x10):
+				{
+					mFighter.b_e_rook |= 1 << i;
+					break;
+				}
+				} // switch ()
+				mFighter.b_occupied |= 1 << i;
+			}
+			else // hand
+			{
+				switch (mBoard[i])
+				{
+				case (GOLD | 0x10):
+				{
+					int p = i - BOARD_SIZE - 10;
+					mFighter.black_hand |= 1 << p;
+					break;
+				}
+				case (SILVER | 0x10):
+				{
+					int p = i - BOARD_SIZE - 10;
+					mFighter.black_hand |= 1 << p;
+					break;
+				}
+				case (PAWN | 0x10):
+				{
+					int p = i - BOARD_SIZE - 10;
+					mFighter.black_hand |= 1 << p;
+					break;
+				}
+				case (BISHOP | 0x10):
+				{
+					int p = i - BOARD_SIZE - 10;
+					mFighter.black_hand |= 1 << p;
+					break;
+				}
+				case (ROOK | 0x10):
+				{
+					int p = i - BOARD_SIZE - 10;
+					mFighter.black_hand |= 1 << p;
+					break;
+				}
+				} // switch ()
+			}
+		}
+		else // white
+		{
+			if (i < BOARD_SIZE) // board
+			{
+				switch (mBoard[i])
+				{
+				case KING:
+				{
+					mFighter.w_king |= 1 << i;
+					break;
+				}
+				case GOLD:
+				{
+					mFighter.w_gold |= 1 << i;
+					break;
+				}
+				case SILVER:
+				{
+					mFighter.w_silver |= 1 << i;
+					break;
+				}
+				case PAWN:
+				{
+					mFighter.w_pawn |= 1 << i;
+					break;
+				}
+				case BISHOP:
+				{
+					mFighter.w_bishop |= 1 << i;
+					break;
+				}
+				case ROOK:
+				{
+					mFighter.w_rook |= 1 << i;
+					break;
+				}
+				case eSILVER:
+				{
+					mFighter.w_e_silver |= 1 << i;
+					break;
+				}
+				case ePAWN:
+				{
+					mFighter.w_e_pawn |= 1 << i;
+					break;
+				}
+				case eBISHOP:
+				{
+					mFighter.w_e_bishop |= 1 << i;
+					break;
+				}
+				case eROOK:
+				{
+					mFighter.w_e_rook |= 1 << i;
+					break;
+				}
+				} // switch ()
+				mFighter.w_occupied |= 1 << i;
+			}
+			else // hand
+			{
+				switch (mBoard[i])
+				{
+				case GOLD:
+				{
+					int p = i - BOARD_SIZE;
+					mFighter.white_hand |= 1 << p;
+					break;
+				}
+				case SILVER:
+				{
+					int p = i - BOARD_SIZE;
+					mFighter.white_hand |= 1 << p;
+					break;
+				}
+				case PAWN:
+				{
+					int p = i - BOARD_SIZE;
+					mFighter.white_hand |= 1 << p;
+					break;
+				}
+				case BISHOP:
+				{
+					int p = i - BOARD_SIZE;
+					mFighter.white_hand |= 1 << p;
+					break;
+				}
+				case ROOK:
+				{
+					int p = i - BOARD_SIZE;
+					mFighter.white_hand |= 1 << p;
+					break;
+				}
+				}
+			}
+		}
+	}
+}
+
 int boardpos2index(char row, char col) {
 	if ((int)row >= (int)'A' && (int)row <= (int)'I' && col >= '1' && col <= '5') {
 		return (int)(row - 'A') * 5 + 4 - col + '1';

@@ -1,6 +1,8 @@
 #ifndef _HEAD_
 #define _HEAD_
 
+using namespace std;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +10,7 @@
 #include <time.h>
 #include <direct.h>
 #include <ctype.h>
+#include <cstring>
 #include "define.h"
 #include "change.h"
 #include "library.h"
@@ -15,7 +18,8 @@
 #include "evaluate.h"
 
 extern U64 nodes;
-extern double total_branch;
-extern double search_branch;
+extern U64 failed_nodes;
+extern U64 leave_nodes;
+extern int pv_chessboard[CHESS_BOARD_SIZE];
 
 #endif
