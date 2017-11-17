@@ -1,6 +1,6 @@
 #include "head.h"
 
-int QuiescenceSearch (fighter *board, int *chessboard, int alpha, int beta, int turn)
+int QuiescenceSearch (Bitboard *board, int *chessboard, int alpha, int beta, int turn)
 {
 	// terminal 
 	if (board->w_king == 0 || board->b_king == 0)

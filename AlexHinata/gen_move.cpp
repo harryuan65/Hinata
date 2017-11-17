@@ -6,9 +6,9 @@
 // 14 bits  pro  eat  dst  src
 //		 	 1    1    6    6
 
-typedef void (*genmove_t)(int *, fighter, U16 *, int);
+typedef void (*genmove_t)(int *, Bitboard, U16 *, int);
 
-int Generator (fighter board, U16 *movelist, int turn)
+int Generator (Bitboard board, U16 *movelist, int turn)
 {
 	genmove_t genmove_func[3] = {AttackGenerator, MoveGenerator, HandGenerator}; 
 
@@ -21,7 +21,7 @@ int Generator (fighter board, U16 *movelist, int turn)
 	return ret;
 }
 
-void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
+void AttackGenerator (int *start, Bitboard board, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
 	if (turn == WHITE)
@@ -436,7 +436,7 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 	return ;
 }
 
-void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
+void MoveGenerator (int *start, Bitboard board, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
 	if (turn == WHITE)
@@ -829,7 +829,7 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 	return ;
 }
 
-U32 RookMove (fighter board, int pos, int turn)
+U32 RookMove (Bitboard board, int pos, int turn)
 {
 	// upper (find LSB) ; lower (find MSB)
 	U32 ret = 0;
@@ -869,7 +869,7 @@ U32 RookMove (fighter board, int pos, int turn)
 	return ret;
 }
 
-U32 BishopMove (fighter board, int pos, int turn)
+U32 BishopMove (Bitboard board, int pos, int turn)
 {
 	// upper (find LSB) ; lower (find MSB)
 	U32 ret = 0;

@@ -11,15 +11,18 @@ using namespace std;
 #include <direct.h>
 #include <ctype.h>
 #include <cstring>
+#include <vector>
 #include "define.h"
 #include "change.h"
 #include "library.h"
 #include "function.h"
 #include "evaluate.h"
 
+extern bool isFullFailHigh;
 extern U64 nodes;
 extern U64 failed_nodes;
 extern U64 leave_nodes;
+extern U64 depth2_nodes;
 extern int pv_chessboard[CHESS_BOARD_SIZE];
 
 #endif

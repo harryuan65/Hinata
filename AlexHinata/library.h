@@ -40,7 +40,7 @@ enum {
 };
 
 /*	bitboard	*/
-typedef struct fighter_t
+typedef struct Bitboard_t
 {
 	// U64 hash_key;
 	U32 w_occupied, b_occupied;
@@ -56,7 +56,7 @@ typedef struct fighter_t
 	U32 w_e_bishop,	b_e_bishop;		// 16, 17
 	U32 w_e_rook,	b_e_rook;		// 18, 19
 	U16 black_hand,	white_hand;
-} fighter;
+} Bitboard;
 
 
 /*	generate ordering	*/

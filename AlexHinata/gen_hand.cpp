@@ -1,6 +1,6 @@
 #include "head.h"
 
-void HandGenerator (int *start, fighter board, U16 *movelist, int turn)
+void HandGenerator(int *start, Bitboard board, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
 	int all_moves = *start; // before doing HandGenerator, start is all moves
@@ -246,7 +246,7 @@ void HandGenerator (int *start, fighter board, U16 *movelist, int turn)
 	return ;
 }
 
-void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist, int turn)
+void HandGenerator_s(int *start, Bitboard board, int *chessboard, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
 	int all_moves = *start; // before doing HandGenerator, start is all moves
@@ -578,7 +578,7 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 	return ;
 }
 
-U32 Uchifuzume (fighter board, int turn)
+U32 Uchifuzume (Bitboard board, int turn)
 {
 	U32 ret = FULL_BOARD;
 	U32 king_front_square, kmoves;
@@ -609,7 +609,7 @@ U32 Uchifuzume (fighter board, int turn)
 	return ret;
 }
 
-U32 GenerateAllMoves (fighter board, U32 apawn, int turn, int type)
+U32 GenerateAllMoves (Bitboard board, U32 apawn, int turn, int type)
 {
 	U32 ret = 0;
 	U32 tempboard;
@@ -793,7 +793,7 @@ U32 GenerateAllMoves (fighter board, U32 apawn, int turn, int type)
 	return ret;
 }
 
-U32 RookMove_h (fighter board, int pos, int turn)
+U32 RookMove_h (Bitboard board, int pos, int turn)
 {
 	// upper (find LSB) ; lower (find MSB)
 	U32 ret = 0;
@@ -831,7 +831,7 @@ U32 RookMove_h (fighter board, int pos, int turn)
 	return ret;
 }
 
-U32 BishopMove_h (fighter board, int pos, int turn)
+U32 BishopMove_h (Bitboard board, int pos, int turn)
 {
 	// upper (find LSB) ; lower (find MSB)
 	U32 ret = 0;
@@ -869,7 +869,7 @@ U32 BishopMove_h (fighter board, int pos, int turn)
 	return ret;
 }
 
-int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
+int UchifuzumeGenerator(Bitboard board, U16 *movelist, int turn, int type)
 {
 	int ret = 0;
 	U32 srcboard, dstboard, temp;

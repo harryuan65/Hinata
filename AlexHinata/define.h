@@ -122,12 +122,15 @@ typedef unsigned __int8   U8;
 #define DEPTH_UCHI      3
 #define FIRST           1
 
+/* Player type */
+#define HUMAN 0
+#define AI    1
+
 typedef struct line_t 
 {
 	int pv_count;
 	U16 pv[LIMIT_DEPTH + 1];
 }line;
-
 
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)

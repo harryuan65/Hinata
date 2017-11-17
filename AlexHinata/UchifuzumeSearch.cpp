@@ -1,6 +1,6 @@
 #include "head.h"
 
-bool Uchifuzume_Searching (fighter *board, int *chessboard, int turn, int depth)
+bool Uchifuzume_Searching (Bitboard *board, int *chessboard, int turn, int depth)
 {
 	// terminal 
 	if (board->w_king == 0 || board->b_king == 0)

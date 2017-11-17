@@ -1,7 +1,7 @@
 #include "head.h"
 #include "move.h"
 
-void Inital (fighter *board, int *chessboard)
+void Inital (Bitboard *board, int *chessboard)
 {
 	board->w_occupied = WHITE_INIT;
 	board->b_occupied = BLACK_INIT;

@@ -152,17 +152,14 @@
     <ClInclude Include="move.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alphabeta.cpp" />
     <ClCompile Include="bitscan.cpp" />
     <ClCompile Include="change.cpp" />
     <ClCompile Include="evaluate.cpp" />
     <ClCompile Include="gen_hand.cpp" />
     <ClCompile Include="gen_move.cpp" />
     <ClCompile Include="gen_pro.cpp" />
-    <ClCompile Include="hash.cpp" />
     <ClCompile Include="initial.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="minimax.cpp" />
     <ClCompile Include="move.cpp" />
     <ClCompile Include="print bit board.cpp" />
     <ClCompile Include="quiet.cpp" />

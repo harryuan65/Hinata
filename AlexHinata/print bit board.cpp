@@ -260,7 +260,7 @@ void PrintChessBoard(int *chessboard)
 	return;
 }
 
-void SetFighter(fighter& mFighter, int* mBoard) {
+void SetBitboard(Bitboard& mFighter, int* mBoard) {
 	for (int i = 0; i < CHESS_BOARD_SIZE; i++) {
 		if (mBoard[i] == BLANK) {
 			continue;

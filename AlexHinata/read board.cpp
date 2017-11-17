@@ -15,7 +15,7 @@ e_rook   =     13     |      29
 	         white          black
 */
 
-void ReadBoard(int *chessboard, fighter *board, int filenum)
+void ReadBoard(int *chessboard, Bitboard *board, int filenum)
 {
 	// can read check ok!!!
 	// resolve chessboard to bitboard

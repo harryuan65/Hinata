@@ -1,7 +1,7 @@
 #include "head.h"
 #include "move.h"
 
-U16 DoMove (U16 move, fighter *board, int *chessboard, int turn)
+U16 DoMove(U16 action, Bitboard *board, int *chessboard, int turn)
 {
 	// ***********************************
 	// 14 bytes  X  |  X  | XXXXXX | XXXXXX (<-)
@@ -13,10 +13,10 @@ U16 DoMove (U16 move, fighter *board, int *chessboard, int turn)
 	int src, dst, eat, pro;
 	int src_pce, dst_pce;
 
-	src =  move & SRC_MASK;
-	dst = (move & DST_MASK) >> 6;
-	eat = (move & EAT_MASK) >> 12;
-	pro =  move >> 13;
+	src = action & SRC_MASK;
+	dst = (action & DST_MASK) >> 6;
+	eat = (action & EAT_MASK) >> 12;
+	pro = action >> 13;
 
 	src_pce = chessboard[src];
 	dst_pce = chessboard[dst];
@@ -85,7 +85,7 @@ U16 DoMove (U16 move, fighter *board, int *chessboard, int turn)
 	return ret;
 }
 
-void DoHandMove (int src, fighter *board)
+void DoHandMove (int src, Bitboard *board)
 {
 	switch (src)
 	{
@@ -114,7 +114,7 @@ void DoHandMove (int src, fighter *board)
 	return ;
 }
 
-U8 SaveCapture (int pce, fighter *board, int *chessboard)
+U8 SaveCapture (int pce, Bitboard *board, int *chessboard)
 {
 	U8 ret;
 
@@ -268,7 +268,7 @@ U8 SaveCapture (int pce, fighter *board, int *chessboard)
 	return ret;
 }
 
-void UnDoMove (U16 capture, U16 move, fighter *board, int *chessboard, int turn)
+void UnDoMove (U16 capture, U16 action, Bitboard *board, int *chessboard, int turn)
 {
 	// ***********************************
 	// 14 bytes  X  |  X  | XXXXXX | XXXXXX (<-)
@@ -282,9 +282,9 @@ void UnDoMove (U16 capture, U16 move, fighter *board, int *chessboard, int turn)
 	int src, dst, pro;
 	int src_pce, dst_pce;
 
-	src =  move & SRC_MASK;
-	dst = (move & DST_MASK) >> 6;
-	pro =  move >> 13;
+	src = action & SRC_MASK;
+	dst = (action & DST_MASK) >> 6;
+	pro = action >> 13;
 
 	src_pce = chessboard[src];
 	dst_pce = chessboard[dst];
@@ -360,7 +360,7 @@ void UnDoMove (U16 capture, U16 move, fighter *board, int *chessboard, int turn)
 	return ;
 }
 
-void UnDoHandMove (int src, fighter *board)
+void UnDoHandMove (int src, Bitboard *board)
 {
 	switch (src)
 	{
@@ -389,7 +389,7 @@ void UnDoHandMove (int src, fighter *board)
 	return ;
 }
 
-void RemoveCapture (int cap_place, fighter *board)
+void RemoveCapture (int cap_place, Bitboard *board)
 {
 	switch (cap_place)
 	{

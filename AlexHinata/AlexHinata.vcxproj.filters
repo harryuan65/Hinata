@@ -41,9 +41,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alphabeta.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
     <ClCompile Include="bitscan.cpp">
       <Filter>資源檔</Filter>
     </ClCompile>
@@ -62,16 +59,10 @@
     <ClCompile Include="gen_pro.cpp">
       <Filter>資源檔</Filter>
     </ClCompile>
-    <ClCompile Include="hash.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
     <ClCompile Include="initial.cpp">
       <Filter>資源檔</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="minimax.cpp">
       <Filter>資源檔</Filter>
     </ClCompile>
     <ClCompile Include="move.cpp">
