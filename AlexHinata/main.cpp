@@ -1,12 +1,12 @@
 #include "head.h"
-#include "main.h"
 
+bool isFullFailHigh;
 U64 nodes;
 U64 failed_nodes;
 U64 leave_nodes;
 U64 depth2_nodes;
-bool isFullFailHigh;
-int pv_chessboard[CHESS_BOARD_SIZE];
+HistoryHeuristic mHistoryHeur(true);
+Transposition mTransposition(true);
 
 void CustomBoard(Bitboard mBitboard, int* chessboard) {
 	// 黑棋 上
@@ -66,7 +66,6 @@ int main (int argc, char *argv[])
 	Inital(&mBitboard, chessboard);
 	//CustomBoard(mBitboard, chessboard);
 
-	//PrintChessBoard(chessboard);
 	printf("DEBUG : Full FailHigh?(true : 1/ false : 0)");
 	scanf("%d", &isFullFailHigh);
 	printf("請選擇先後手 (0)先手 (1)後手 (2)玩家對打 (3)電腦對打 \n");
@@ -93,6 +92,7 @@ int main (int argc, char *argv[])
 	while (1) {
 		printf("\n---------Step %d Player %d turn---------\n", step, turn);
 		PrintChessBoard(chessboard);
+		printf("Zobrist Number %lu\n", mTransposition.ZobristHashing(chessboard));
 		if (player[turn] == HUMAN) {
 			int src = 0, dst = 0, eat = 0, pro = 0;
 			char srcStr[2], dstStr[2];
@@ -132,8 +132,8 @@ int main (int argc, char *argv[])
 
 			// Print Result
 			printf("\n");
-			PrintPV(path, 0, path.pv_count);
-			printf("Depth2 Failed-High Node : %d\n", depth2_nodes);
+			PrintPV(path, pvCount, path.pv_count);
+			//printf("Depth2 Failed-High Node : %d\n", depth2_nodes);
 			printf(
 				"Total Nodes       : %11llu\n"
 				"Failed-High Nodes : %11llu\n"
@@ -145,8 +145,10 @@ int main (int argc, char *argv[])
 				nodes, failed_nodes, leave_nodes, durationTime,
 				(durationTime ? nodes / durationTime : 0), Evaluate(chessboard), pvEvaluate);
 			nodes = 0;
+			//depth2_nodes = 0;
 			failed_nodes = 0;
 			leave_nodes = 0;
+			mHistoryHeur.SaveTable();
 		}
 		turn ^= 1;
 		step++;

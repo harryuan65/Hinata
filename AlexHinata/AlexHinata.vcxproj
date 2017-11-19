@@ -147,9 +147,10 @@
     <ClInclude Include="evaluate.h" />
     <ClInclude Include="function.h" />
     <ClInclude Include="head.h" />
+    <ClInclude Include="HistoryHeuristic.h" />
     <ClInclude Include="library.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="move.h" />
+    <ClInclude Include="Transposition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitscan.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="gen_hand.cpp" />
     <ClCompile Include="gen_move.cpp" />
     <ClCompile Include="gen_pro.cpp" />
+    <ClCompile Include="HistoryHeuristic.cpp" />
     <ClCompile Include="initial.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="move.cpp" />
@@ -165,6 +167,7 @@
     <ClCompile Include="quiet.cpp" />
     <ClCompile Include="read board.cpp" />
     <ClCompile Include="scout.cpp" />
+    <ClCompile Include="Transposition.cpp" />
     <ClCompile Include="UchifuzumeSearch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
