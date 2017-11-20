@@ -14,13 +14,12 @@ e_rook   =     13     |      29
 
 	         white          black
 */
-
+/*
 void ReadBoard(int *chessboard, fighter *board, int filenum)
 {
 	// can read check ok!!!
 	// resolve chessboard to bitboard
 	//    white  <- | 16 | ->  black
-	#define COLOR_CHANGE   16
 	#define COLOR_BLACK  0x10  // 16
 	FILE *fptr;
 	char buffer[50];
@@ -30,7 +29,7 @@ void ReadBoard(int *chessboard, fighter *board, int filenum)
 	//sprintf(buffer, "D:\\¬ã¨s«Ç\\shogi\\test board\\board%05d.txt", filenum); // school
 	//sprintf(buffer, "X:\\Hinata\\test board\\board%05d.txt", filenum); // test
 	sprintf_s(buffer, "X:\\Hinata\\testing_battle\\board.txt"); // test
-	fptr = fopen(buffer, "r");
+	fopen_s(&fptr, buffer, "r");
 
 	if (!fptr) 
 	{
@@ -38,7 +37,7 @@ void ReadBoard(int *chessboard, fighter *board, int filenum)
 		return ;
 	}
 
-	while (fscanf(fptr, "%d", &temp) == 1)
+	while (fscanf_s(fptr, "%d", &temp) == 1)
 	{
 		chessboard[counter] = temp; 
 		if (temp == BLANK)
@@ -46,7 +45,7 @@ void ReadBoard(int *chessboard, fighter *board, int filenum)
 			counter++;
 			continue;
 		}
-		if (chessboard[counter] > COLOR_CHANGE) // black
+		if (chessboard[counter] > BOARD_SIZE) // black
 		{
 			if (counter < BOARD_SIZE) // board
 			{
@@ -242,7 +241,6 @@ void ReadBoard(int *chessboard, fighter *board, int filenum)
 	}
 	
 	#undef COLOR_BLACK
-	#undef COLOR_CHANGE
 	fclose(fptr);
 	return ;
-}
+}*/

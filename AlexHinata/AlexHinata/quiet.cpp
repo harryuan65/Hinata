@@ -12,7 +12,7 @@ int QuiescenceSearch (fighter *board, int *chessboard, int alpha, int beta, int 
 	int cnt = 0;
 	int n = beta;
 	U16 movelist[MAX_MOVE_NUM] = {BLANK};
-	AttackGenerator(&cnt, *board, movelist, turn);
+	AttackGenerator(cnt, *board, movelist, turn);
 
 	for (int i = 0; i < cnt; i++)
 	{

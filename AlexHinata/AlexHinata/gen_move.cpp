@@ -6,23 +6,22 @@
 // 14 bits  pro  eat  dst  src
 //		 	 1    1    6    6
 
-typedef void (*genmove_t)(int *, fighter, U16 *, int);
+typedef void (*genmove_t)(int &, fighter &, U16 *, int);
 
-int Generator (fighter board, U16 *movelist, int turn)
-{
+int Generator (fighter &board, U16 *movelist, int turn) {
 	genmove_t genmove_func[3] = {AttackGenerator, MoveGenerator, HandGenerator}; 
 
 	//  attack -> move -> hand
-	int ret = 0;	
-
+    int ret = 0;
 	for (int i = 0; i < 3; i++)
-		genmove_func[i](&ret, board, movelist, turn);
+		genmove_func[i](ret, board, movelist, turn);
 
 	return ret;
 }
 
-void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
+void AttackGenerator (int &start, fighter &board, U16 *movelist, int turn)
 {
+    unsigned long src, dst;
 	// start is movelist which it starts from.
 	if (turn == WHITE)
 	{
@@ -34,14 +33,15 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 			case KING:
 				{
 					srcboard = board.w_king;
-					int src = BitScan(&srcboard);
+					_BitScanForward(&src, srcboard);
 					dstboard = w_king_attack(src);
 					while (dstboard)
 					{
-						int dst = BitScan(&dstboard); // LSB
-						movelist[*start]     |= src;
-						movelist[*start]     |= dst << 6;
-						movelist[(*start)++] |= EAT_MASK;
+						_BitScanForward(&dst, dstboard); // LSB
+                        dstboard ^= 1 << dst;
+						movelist[start]     |= src;
+						movelist[start]     |= dst << 6;
+						movelist[(start)++] |= EAT_MASK;
 					}
 					break;
 				}
@@ -51,14 +51,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_gold;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_gold_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+							_BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -69,14 +71,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_silver_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 							PromoteGenerator(start, src, dst, movelist, turn, true);
 						}
 					}
@@ -88,23 +92,25 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_pawn_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
 							if (dst < 5)
 							{
-								movelist[*start]     |= src;
-								movelist[*start]     |= dst << 6;
-								movelist[*start]     |= EAT_MASK;
-								movelist[(*start)++] |= PRO_MASK;
+								movelist[start]     |= src;
+								movelist[start]     |= dst << 6;
+								movelist[start]     |= EAT_MASK;
+								movelist[(start)++] |= PRO_MASK;
 							}
 							else
 							{
-								movelist[*start]     |= src;
-								movelist[*start]     |= dst << 6;
-								movelist[(*start)++] |= EAT_MASK;
+								movelist[start]     |= src;
+								movelist[start]     |= dst << 6;
+								movelist[(start)++] |= EAT_MASK;
 							}
 						}
 					}
@@ -116,15 +122,17 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_bishop_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, true);
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -135,15 +143,17 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_rook_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, true);
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -154,14 +164,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_gold_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -172,14 +184,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_gold_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -190,14 +204,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_e_bishop_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -208,14 +224,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_e_rook_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+							_BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -233,15 +251,15 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 			case KING:
 				{
 					srcboard = board.b_king;
-					int src = BitScan(&srcboard);
+                    _BitScanForward(&src, srcboard);
 					dstboard = b_king_attack(src);
 					while (dstboard)
 					{
-						int dst = BitScanReverse(dstboard); // MSB
-						movelist[*start]     |= src;
-						movelist[*start]     |= dst << 6;
-						movelist[(*start)++] |= EAT_MASK;
-						dstboard ^= 1 << dst;
+                        _BitScanReverse(&dst, dstboard); // MSB
+                        dstboard ^= 1 << dst;
+						movelist[start]     |= src;
+						movelist[start]     |= dst << 6;
+						movelist[(start)++] |= EAT_MASK;
 					}
 					break;
 				}
@@ -251,15 +269,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_gold;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_gold_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -270,16 +289,17 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_silver_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 							PromoteGenerator(start, src, dst, movelist, turn, true);
-							dstboard ^= 1 << dst;
 						}
 					}
 					break;
@@ -290,25 +310,26 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_pawn_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
 							if (dst > 19 && dst < BOARD_SIZE)
 							{
-								movelist[*start]     |= src;
-								movelist[*start]     |= dst << 6;
-								movelist[*start]     |= EAT_MASK;
-								movelist[(*start)++] |= PRO_MASK;
+								movelist[start]     |= src;
+								movelist[start]     |= dst << 6;
+								movelist[start]     |= EAT_MASK;
+								movelist[(start)++] |= PRO_MASK;
 							}
 							else
 							{
-								movelist[*start]     |= src;
-								movelist[*start]     |= dst << 6;
-								movelist[(*start)++] |= EAT_MASK;
+								movelist[start]     |= src;
+								movelist[start]     |= dst << 6;
+								movelist[(start)++] |= EAT_MASK;
 							}
-							dstboard ^= 1 << dst;
 						}
 					}
 					break;
@@ -319,16 +340,17 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_bishop_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, true);
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -339,16 +361,17 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_rook_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, true);
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -359,15 +382,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_gold_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -378,15 +402,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_gold_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -397,15 +422,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_e_bishop_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -416,15 +442,16 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_e_rook_attack(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[*start]     |= dst << 6;
-							movelist[(*start)++] |= EAT_MASK;
-							dstboard ^= 1 << dst;
+							_BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[start]     |= dst << 6;
+							movelist[(start)++] |= EAT_MASK;
 						}
 					}
 					break;
@@ -436,8 +463,9 @@ void AttackGenerator (int *start, fighter board, U16 *movelist, int turn)
 	return ;
 }
 
-void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
+void MoveGenerator (int &start, fighter &board, U16 *movelist, int turn)
 {
+    unsigned long src, dst;
 	// start is movelist which it starts from.
 	if (turn == WHITE)
 	{
@@ -449,13 +477,14 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 			case KING:
 				{
 					srcboard = board.w_king;
-					int src = BitScan(&srcboard);
+					_BitScanForward(&src, srcboard);
 					dstboard = w_king_movement(src);
 					while (dstboard)
 					{
-						int dst = BitScan(&dstboard); // LSB
-						movelist[*start]     |= src;
-						movelist[(*start)++] |= dst << 6;
+                        _BitScanForward(&dst, dstboard); // LSB
+                        dstboard ^= 1 << dst;
+						movelist[start]     |= src;
+						movelist[(start)++] |= dst << 6;
 					}
 					break;
 				}
@@ -465,13 +494,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_gold;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_gold_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -482,13 +513,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_silver_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 							PromoteGenerator(start, src, dst, movelist, turn, false);
 						}
 					}
@@ -500,21 +533,23 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_pawn_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
 							if (dst < 5)
 							{
-								movelist[*start]     |= src;
-								movelist[*start]     |= dst << 6;
-								movelist[(*start)++] |= PRO_MASK;
+								movelist[start]     |= src;
+								movelist[start]     |= dst << 6;
+								movelist[(start)++] |= PRO_MASK;
 							}
 							else
 							{
-								movelist[*start]     |= src;
-								movelist[(*start)++] |= dst << 6;
+								movelist[start]     |= src;
+								movelist[(start)++] |= dst << 6;
 							}
 						}
 					}
@@ -526,14 +561,16 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_bishop_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, false);
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -544,14 +581,16 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_rook_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, false);
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -562,13 +601,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_gold_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -579,13 +620,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_gold_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -596,13 +639,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_e_bishop_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+                            _BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -613,13 +658,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.w_e_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = w_e_rook_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScan(&dstboard); // LSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+							_BitScanForward(&dst, dstboard); // LSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -637,14 +684,14 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 			case KING:
 				{
 					srcboard = board.b_king;
-					int src = BitScan(&srcboard);
+                    _BitScanForward(&src, srcboard);
 					dstboard = b_king_movement(src);
 					while (dstboard)
 					{
-						int dst = BitScanReverse(dstboard); // MSB
-						movelist[*start]     |= src;
-						movelist[(*start)++] |= dst << 6;
-						dstboard ^= 1 << dst;
+                        _BitScanReverse(&dst, dstboard); // MSB
+                        dstboard ^= 1 << dst;
+						movelist[start]     |= src;
+						movelist[(start)++] |= dst << 6;
 					}
 					break;
 				}
@@ -654,14 +701,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_gold;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_gold_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -672,15 +720,16 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_silver_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 							PromoteGenerator(start, src, dst, movelist, turn, false);
-							dstboard ^= 1 << dst;
 						}
 					}
 					break;
@@ -691,23 +740,24 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_pawn_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
 							if (dst > 19 && dst < BOARD_SIZE)
 							{
-								movelist[*start]     |= src;
-								movelist[*start]	 |= dst << 6;
-								movelist[(*start)++] |= PRO_MASK;
+								movelist[start]     |= src;
+								movelist[start]	 |= dst << 6;
+								movelist[(start)++] |= PRO_MASK;
 							}
 							else
 							{
-								movelist[*start]     |= src;
-								movelist[(*start)++] |= dst << 6;
+								movelist[start]     |= src;
+								movelist[(start)++] |= dst << 6;
 							}
-							dstboard ^= 1 << dst;
 						}
 					}
 					break;
@@ -718,15 +768,16 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_bishop_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, false);
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -737,15 +788,16 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_rook_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
 							PromoteGenerator(start, src, dst, movelist, turn, false);
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -756,14 +808,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_silver;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_gold_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -774,14 +827,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_pawn;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_gold_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -792,14 +846,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_bishop;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_e_bishop_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+                            _BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -810,14 +865,15 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 					srcboard = board.b_e_rook;
 					while (srcboard)
 					{
-						int src = BitScan(&srcboard);
+                        _BitScanForward(&src, srcboard);
+                        srcboard ^= 1 << src;
 						dstboard = b_e_rook_movement(src);
 						while (dstboard)
 						{
-							int dst = BitScanReverse(dstboard); // MSB
-							movelist[*start]     |= src;
-							movelist[(*start)++] |= dst << 6;
-							dstboard ^= 1 << dst;
+							_BitScanReverse(&dst, dstboard); // MSB
+                            dstboard ^= 1 << dst;
+							movelist[start]     |= src;
+							movelist[(start)++] |= dst << 6;
 						}
 					}
 					break;
@@ -829,81 +885,62 @@ void MoveGenerator (int *start, fighter board, U16 *movelist, int turn)
 	return ;
 }
 
-U32 RookMove (fighter board, int pos, int turn)
-{
-	// upper (find LSB) ; lower (find MSB)
-	U32 ret = 0;
-	U32 occupied = board.b_occupied | board.w_occupied;
-	U32 rank, file;
-	U32 upper, lower;
-	int bitpos;
-
-	// rank
-	upper = (occupied & rank_upper[pos]) | HIGHTEST_BOARD_POS;
-	lower = (occupied & rank_lower[pos]) | LOWEST_BOARD_POS;
-
-	bitpos = BitScan(&upper);
-	upper  = 1 << (bitpos + 1);
-
-	bitpos = BitScanReverse(lower);
-	lower  = 1 << bitpos;
-
-	rank = (upper - lower) & rank_mask(pos);
-
-	// file
-	upper = (occupied & file_upper[pos]) | HIGHTEST_BOARD_POS;
-	lower = (occupied & file_lower[pos]) | LOWEST_BOARD_POS;
-
-	bitpos = BitScan(&upper);
-	upper  = 1 << (bitpos + 1);
-
-	bitpos = BitScanReverse(lower);
-	lower  = 1 << bitpos;
-
-	file = (upper - lower) & file_mask(pos);
-
-	ret = rank | file;
-	ret &= (turn == WHITE) ? ret ^ board.w_occupied \
-		: ret ^ board.b_occupied;
-
-	return ret;
+/*
+***************************
+*    enemy's territory    *    // 0 ~ 4   (A)
+***************************
+*                         *
+*         neutral         *    // 5 ~ 19  (B)
+*                         *
+***************************
+*    my own territory     *    // 20 ~ 24 (C)
+***************************
+*/
+// there are three types to upgrade.
+// for example turn is WHITE,
+//		(1).  (C)/(B) ->   (A)
+//		(2).	(A)   ->	   (A)
+//		(3).	(A)   -> (B)/(C)
+void PromoteGenerator(int &start, int src, int dst, U16 *movelist, int turn, bool atk) {
+    if (turn == WHITE ?
+        // 一般移動 || 吃子移動
+        (src < BOARD_SIZE && dst < 5) || (src < 5 && dst < BOARD_SIZE) :
+        (src < BOARD_SIZE && dst > 19) || (src > 19 && src < BOARD_SIZE && dst < BOARD_SIZE))
+        movelist[start++] = PRO_MASK | (atk ? EAT_MASK : 0) | dst << 6 | src;
 }
 
-U32 BishopMove (fighter board, int pos, int turn)
-{
-	// upper (find LSB) ; lower (find MSB)
-	U32 ret = 0;
-	U32 occupied = board.b_occupied | board.w_occupied;	
-	U32 slope1, slope2;
-	U32 upper, lower;
-	int bitpos;
+U32 RookMove (fighter &board, int pos, int turn) {
+    U32 ret = RookMove_h(board, pos, turn);
+	return (turn == WHITE) ?
+        ret & (ret ^ board.w_occupied) :
+        ret & (ret ^ board.b_occupied);
+}
 
-	// slope1 "/"
-	upper = (occupied & slope1_upper[pos]) | HIGHTEST_BOARD_POS;
-	lower = (occupied & slope1_lower[pos]) | LOWEST_BOARD_POS;
+U32 BishopMove (fighter &board, int pos, int turn) {
+    U32 ret = BishopMove_h(board, pos, turn);
+    /*int p, tmp, dl = 0, ur = 0, dr = 0, ul = 0;
+    for (p = pos, tmp = pos + 4; tmp < 25 && p % 5; tmp = (p = tmp) + 4) {
+        dl |= 1 << tmp;
+        if (occupied & dl) break;
+    }
 
-	bitpos = BitScan(&upper);
-	upper = 1 << (bitpos + 1);
+    for (p = pos, tmp = pos - 4; tmp >= 0 && p % 5 != 4; tmp = (p = tmp) - 4) {
+        ur |= 1 << tmp;
+        if (occupied & ur) break;
+    }
 
-	bitpos = BitScanReverse(lower);
-	lower = 1 << bitpos;
+    for (p = pos, tmp = pos + 6; tmp < 25 && p % 5 != 4; tmp = (p = tmp) + 6) {
+        dr |= 1 << tmp;
+        if (occupied & dr) break;
+    }
 
-	slope1 = (upper - lower) & slope1_mask(pos);
+    for (p = pos, tmp = pos - 6; tmp >= 0 && p % 5; tmp = (p = tmp) - 6) {
+        ul |= 1 << tmp;
+        if (occupied & ul) break;
+    }
 
-	// slope2 "\"
-	upper = (occupied & slope2_upper[pos]) | HIGHTEST_BOARD_POS;
-	lower = (occupied & slope2_lower[pos]) | LOWEST_BOARD_POS;
-
-	bitpos = BitScan(&upper);
-	upper = 1 << (bitpos + 1);
-
-	bitpos = BitScanReverse(lower);
-	lower = 1 << bitpos;
-
-	slope2 = (upper - lower) & slope2_mask(pos);
-
-	ret = slope1 | slope2;
-	ret = (turn == WHITE) ? ret & (ret ^ board.w_occupied) \
-		: ret & (ret ^ board.b_occupied);
-	return ret;
+    ret = dl | ur | dr | ul;*/
+    return (turn == WHITE) ?
+        ret & (ret ^ board.w_occupied) :
+        ret & (ret ^ board.b_occupied);
 }

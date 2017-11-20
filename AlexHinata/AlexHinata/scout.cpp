@@ -1,45 +1,44 @@
 #include "head.h"
 
-U64 max_move = 0;
-U64 count = 0;
-double total_branch;
-double search_branch;
-typedef void(*genmove_t)(int *, fighter, U16 *, int);
-const genmove_t genmove_func[] = { AttackGenerator, MoveGenerator, HandGenerator };
+U64 max_move[3] = { 0 };
 
-int NegaScout (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth) {
-	line path;
+typedef void(*genmove_t)(int &, fighter &, U16 *, int);
+static const genmove_t genmove_func[] = { AttackGenerator, MoveGenerator, HandGenerator };
+
+int NegaScout (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth, bool isFailHigh) {
+    ++nodes;
+    failed_nodes += isFailHigh;
 	// using fail soft with negamax:
 	// terminal 
 	if (board->w_king == 0 || board->b_king == 0) {
 		pline->pv_count = 0;
+        leave_nodes += !isFailHigh;
 		return -CHECKMATE;
 	}
 	if (depth == 0) {
 		pline->pv_count = 0;
-		//return (turn == WHITE) ? Evaluate(chessboard) : -Evaluate(chessboard); // evaluating function
+        leave_nodes += !isFailHigh;
 		return QuiescenceSearch(board, chessboard, alpha, beta, turn);
 	}
 
 	int bestscore = -INF;
 	int n = beta;
-    ++nodes;
+    line path;
 
     for (int i = 0; i < 3; ++i) {
         int cnt = 0;
         U16 movelist[128] = { 0 };
-        genmove_func[i](&cnt, *board, movelist, turn);
-        total_branch += cnt;
-        if (cnt > max_move)
-            printf("%d:%lld ", i, (max_move = cnt));
+        genmove_func[i](cnt, *board, movelist, turn);
+
+        if (cnt > max_move[i])
+            printf("%d:%lld ", i, (max_move[i] = cnt));
 
         for (int j = 0; j < cnt; ++j) {
-            ++search_branch;
             U16  capture = DoMove(movelist[j], board, chessboard, turn);
-            int score = -NegaScout(&path, board, chessboard, -n, -max(alpha, bestscore), 1 - turn, depth - 1);
+            int score = -NegaScout(&path, board, chessboard, -n, -max(alpha, bestscore), 1 - turn, depth - 1, isFailHigh);
             if (score > bestscore) {
                 bestscore = ((n == beta) || (depth < 3) || (score >= beta)) ? score : \
-                    - NegaScout(&path, board, chessboard, -beta, -score + 1, 1 - turn, depth - 1);
+                    - NegaScout(&path, board, chessboard, -beta, -score + 1, 1 - turn, depth - 1, isFailHigh);
 
                 pline->pv[0] = movelist[j];
                 memcpy(pline->pv + 1, path.pv, path.pv_count * sizeof(U16));
@@ -53,7 +52,7 @@ int NegaScout (line *pline, fighter *board, int *chessboard, int alpha, int beta
 
 	return bestscore;
 }
-
+/*
 int ScoutMax(line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth)
 {
 	line path;
@@ -134,4 +133,4 @@ int ScoutMin(line *pline, fighter *board, int *chessboard, int alpha, int beta, 
 	}
 
 	return bestscore;
-}
+}*/

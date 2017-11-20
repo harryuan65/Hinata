@@ -36,13 +36,12 @@ enum {
 	//     9		10	   11       12     13
     //	1001	  1010	 1011     1100	 1101 (binary) -> ( pure | PROMOTE )
 	ePAWN = 9, eSILVER, eNULL, eBISHOP, eROOK,
-	CHESS_SIZE = 10
+	CHESS_SIZE = 10,
+    BLACKCHESS = 16
 };
 
 /*	bitboard	*/
-typedef struct fighter_t
-{
-	// U64 hash_key;
+typedef struct fighter_t {
 	U32 w_occupied, b_occupied;
 	// order by chess enum{}		 order
 	U32 w_pawn,		b_pawn;			//  0,  1
@@ -145,6 +144,7 @@ const U32 b_pawn_move[BOARD_SIZE] = {
 };
 
 /*	rook attack which it needs	*/
+/*	file -> '|'	*/
 /*	file upper	*/
 const U32 file_upper[BOARD_SIZE] = {
 	0x0108420,	0x0210840,  0x0421080, 	0x0842100,	0x1084200,	
@@ -153,7 +153,6 @@ const U32 file_upper[BOARD_SIZE] = {
 	0x0100000,	0x0200000,	0x0400000,	0x0800000,	0x1000000,
 	0x0000000,	0x0000000,	0x0000000,	0x0000000,	0x0000000	 
 };	
-
 
 /*	file lower	*/
 const U32 file_lower[BOARD_SIZE] = {
@@ -165,6 +164,7 @@ const U32 file_lower[BOARD_SIZE] = {
 
 };
 
+/*	file -> '-'	*/
 /*	rank upper	*/
 const U32 rank_upper[BOARD_SIZE] = {
 	0x000001e, 	0x000001c, 	0x0000018, 	0x0000010, 	0x0000000,
@@ -221,5 +221,4 @@ const U32 slope2_lower[BOARD_SIZE] = {
 	0x0000000,	0x0000400,	0x0000820,	0x0001041,	0x0002082,
 	0x0000000,	0x0008000,	0x0010400,	0x0020820,	0x0041041
 };
-
 #endif

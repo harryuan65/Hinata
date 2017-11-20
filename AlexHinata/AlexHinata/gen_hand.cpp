@@ -1,9 +1,9 @@
 #include "head.h"
 
-void HandGenerator (int *start, fighter board, U16 *movelist, int turn)
+void HandGenerator (int &start, fighter &board, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
-	int all_moves = *start; // before doing HandGenerator, start is all moves
+	int all_moves = start; // before doing HandGenerator, start is all moves
 	bool once[5] = {false}; // 5 個棋種 { rook ; bishop; gold; silver; pawn }
 
 	if (turn == WHITE)
@@ -14,111 +14,127 @@ void HandGenerator (int *start, fighter board, U16 *movelist, int turn)
 		while (handboard)
 		{
 			U32 dstboard = blank_board;
-			int src = BitScan(&handboard);
+            unsigned long src, dst;
+            _BitScanForward(&src, handboard);
+            handboard ^= 1 << src;
 			switch (src)
 			{
 			case 0: // rook
 				once[0] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 1: // rook
 				if (once[0]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 2: // bishop
 				once[1] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 3: // bishop
 				if (once[1]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 4: // gold
 				once[2] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 5: // gold
 				if (once[2]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 6: // silver
 				once[3] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 7: // silver
 				if (once[3]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 8: // pawn
 				once[4] = true;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+                    unsigned long pos;
+                    _BitScanForward(&pos, pboard);
+                    pboard ^= 1 << pos;
 					nifu |= file_mask(pos);
 				}
 				dstboard &= ~(BLACK_CAMP | nifu) & Uchifuzume (board, WHITE);
 
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 9: // pawn
 				if (once[4]) break;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+                    unsigned long pos;
+                    _BitScanForward(&pos, pboard);
+                    pboard ^= 1 << pos;
 					nifu |= file_mask(pos);
 				}
 				dstboard &= ~(BLACK_CAMP | nifu) & Uchifuzume (board, WHITE);
 
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			} // switch
@@ -132,111 +148,127 @@ void HandGenerator (int *start, fighter board, U16 *movelist, int turn)
 		while (handboard)
 		{
 			U32 dstboard = blank_board;
-			int src = BitScan(&handboard);
+            unsigned long src, dst;
+            _BitScanForward(&src, handboard);
+            handboard ^= 1 << src;
 			switch (src)
 			{
 			case 0: // rook
 				once[0] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 1: // rook
 				if (once[0]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 2: // bishop
 				once[1] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 3: // bishop
 				if (once[1]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 4: // gold
 				once[2] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 5: // gold
 				if (once[2]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 6: // silver
 				once[3] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 7: // silver
 				if (once[3]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 8: // pawn
 				once[4] = true;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+                    unsigned long pos;
+                    _BitScanForward(&pos, pboard);
+                    pboard ^= 1 << pos;
 					nifu |= file_mask(pos);
 				}
 				dstboard &= ~(WHITE_CAMP | nifu) & Uchifuzume (board, BLACK);
 
 				while (dstboard)
 				{
-					int	dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 9: // pawn
 				if (once[4]) break;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+                    unsigned long pos;
+                    _BitScanForward(&pos, pboard);
+                    pboard ^= 1 << pos;
 					nifu |= file_mask(pos);
 				}
 				dstboard &= ~(WHITE_CAMP | nifu) & Uchifuzume (board, BLACK);
 
 				while (dstboard)
 				{
-					int	dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+                    _BitScanForward(&dst, dstboard);
+                    dstboard ^= 1 << dst;
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			} // switch 
@@ -245,11 +277,11 @@ void HandGenerator (int *start, fighter board, U16 *movelist, int turn)
 
 	return ;
 }
-
-void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist, int turn)
+/*
+void HandGenerator_s (int start, fighter board, int *chessboard, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
-	int all_moves = *start; // before doing HandGenerator, start is all moves
+	int all_moves = start; // before doing HandGenerator, start is all moves
 	bool once[5] = {false}; // 5 個棋種 { rook ; bishop; gold; silver; pawn }
 	bool t;
 	U32 temp = 0;
@@ -262,86 +294,86 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 		while (handboard)
 		{
 			U32 dstboard = blank_board;
-			int src = BitScan(&handboard);
+			int src = _BitScanForward(&handboard);
 			switch (src)
 			{
 			case 0: // rook
 				once[0] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 1: // rook
 				if (once[0]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 2: // bishop
 				once[1] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 3: // bishop
 				if (once[1]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 4: // gold
 				once[2] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 5: // gold
 				if (once[2]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 6: // silver
 				once[3] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 7: // silver
 				if (once[3]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 8: // pawn
 				once[4] = true;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+					int pos = _BitScanForward(pboard);
 					nifu |= file_mask(pos);
 				}
 				//dstboard &= ~(BLACK_CAMP | nifu) & Uchifuzume (board, WHITE);
@@ -353,13 +385,13 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 					if (turn == WHITE)
 					{
 						temp = board.b_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos + 5);
 					}
 					else
 					{
 						temp = board.w_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos - 5);
 					}
 					dstboard &= ~(BLACK_CAMP | nifu) & ~temp;
@@ -369,16 +401,16 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 9: // pawn
 				if (once[4]) break;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+					int pos = _BitScanForward(pboard);
 					nifu |= file_mask(pos);
 				}
 				//dstboard &= ~(BLACK_CAMP | nifu) & Uchifuzume (board, WHITE);
@@ -390,13 +422,13 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 					if (turn == WHITE)
 					{
 						temp = board.b_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos + 5);
 					}
 					else
 					{
 						temp = board.w_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos - 5);
 					}
 					dstboard &= ~(BLACK_CAMP | nifu) & ~temp;
@@ -406,9 +438,9 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			} // switch
@@ -422,86 +454,86 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 		while (handboard)
 		{
 			U32 dstboard = blank_board;
-			int src = BitScan(&handboard);
+			int src = _BitScanForward(&handboard);
 			switch (src)
 			{
 			case 0: // rook
 				once[0] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 1: // rook
 				if (once[0]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 2: // bishop
 				once[1] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 3: // bishop
 				if (once[1]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 4: // gold
 				once[2] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 5: // gold
 				if (once[2]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 6: // silver
 				once[3] = true;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 7: // silver
 				if (once[3]) break;
 				while (dstboard)
 				{
-					int dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 8: // pawn
 				once[4] = true;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+					int pos = _BitScanForward(pboard);
 					nifu |= file_mask(pos);
 				}
 				//dstboard &= ~(WHITE_CAMP | nifu) & Uchifuzume (board, BLACK);
@@ -513,13 +545,13 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 					if (turn == WHITE)
 					{
 						temp = board.b_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos + 5);
 					}
 					else
 					{
 						temp = board.w_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos - 5);
 					}
 					dstboard &= ~(WHITE_CAMP | nifu) & ~temp;
@@ -529,16 +561,16 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 
 				while (dstboard)
 				{
-					int	dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int	dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			case 9: // pawn
 				if (once[4]) break;
 				while (pboard)
 				{
-					int pos = BitScan(&pboard);
+					int pos = _BitScanForward(pboard);
 					nifu |= file_mask(pos);
 				}
 				//dstboard &= ~(WHITE_CAMP | nifu) & Uchifuzume (board, BLACK);
@@ -550,13 +582,13 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 					if (turn == WHITE)
 					{
 						temp = board.b_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos + 5);
 					}
 					else
 					{
 						temp = board.w_king;
-						pos = BitScan(&temp);
+						pos = _BitScanForward(temp);
 						temp = 1 << (pos - 5);
 					}
 					dstboard &= ~(WHITE_CAMP | nifu) & ~temp;
@@ -566,9 +598,9 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 
 				while (dstboard)
 				{
-					int	dst = BitScan(&dstboard);
-					movelist[*start]     |= src + BOARD_SIZE + 10;
-					movelist[(*start)++] |= dst << 6;
+					int	dst = _BitScanForward(dstboard);
+					movelist[start]     |= src + BOARD_SIZE + 10;
+					movelist[(start)++] |= dst << 6;
 				}
 				break;
 			} // switch 
@@ -577,18 +609,18 @@ void HandGenerator_s (int *start, fighter board, int *chessboard, U16 *movelist,
 
 	return ;
 }
-
-U32 Uchifuzume (fighter board, int turn)
+*/
+U32 Uchifuzume (fighter &board, int turn)
 {
 	U32 ret = FULL_BOARD;
 	U32 king_front_square, kmoves;
 	U32 temp;
-	int pos;
+	unsigned long pos;
 
 	if (turn == WHITE)
 	{
 		temp = board.b_king;
-		pos = BitScan(&temp);
+        _BitScanForward(&pos, temp);
 		if ((pos + 5) >= BOARD_SIZE) return ret;
 		king_front_square = 1 << (pos + 5);
 		kmoves = b_king_attack(pos) | b_king_movement(pos);
@@ -596,7 +628,7 @@ U32 Uchifuzume (fighter board, int turn)
 	else
 	{
 		temp = board.w_king;
-		pos = BitScan(&temp);
+        _BitScanForward(&pos, temp);
 		if ((pos - 5) < 0) return ret;
 		king_front_square = 1 << (pos - 5);
 		kmoves = w_king_attack(pos) | w_king_movement(pos);
@@ -613,7 +645,7 @@ U32 GenerateAllMoves (fighter board, U32 apawn, int turn, int type)
 {
 	U32 ret = 0;
 	U32 tempboard;
-	int pos;
+	unsigned long pos;
 
 	if (turn == WHITE)
 	{
@@ -632,70 +664,80 @@ U32 GenerateAllMoves (fighter board, U32 apawn, int turn, int type)
 			case 0:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= w_pawn_move[pos];
 				}
 				break;
 			case 1:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= w_silver_move[pos];
 				}
 				break;
 			case 2:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= w_gold_move[pos];
 				}
 				break;
 			case 3:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= BishopMove_h(board, pos, WHITE) & (slope1_mask(pos) | slope2_mask(pos));
 				}
 				break;
 			case 4:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= RookMove_h(board, pos, WHITE) & (rank_mask(pos) | file_mask(pos));
 				}
 				break;
 			case 5:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= king_move[pos];
 				}
 				break;
 			case 6:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= w_gold_move[pos];
 				}
 				break;
 			case 7:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= w_gold_move[pos];
 				}
 				break;
 			case 8:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= BishopMove_h(board, pos, WHITE) & (slope1_mask(pos) | slope2_mask(pos)) | king_move[pos];
 				}
 				break;
 			case 9:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= RookMove_h(board, pos, WHITE) & (rank_mask(pos) | file_mask(pos)) | king_move[pos];
 				}
 				break;
@@ -719,70 +761,80 @@ U32 GenerateAllMoves (fighter board, U32 apawn, int turn, int type)
 			case 0:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= b_pawn_move[pos];
 				}
 				break;
 			case 1:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= b_silver_move[pos];
 				}
 				break;
 			case 2:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= b_gold_move[pos];
 				}
 				break;
 			case 3:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= BishopMove_h(board, pos, BLACK) & (slope1_mask(pos) | slope2_mask(pos));
 				}
 				break;
 			case 4:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= RookMove_h(board, pos, BLACK) & (rank_mask(pos) | file_mask(pos));
 				}
 				break;
 			case 5:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= king_move[pos];
 				}
 				break;
 			case 6:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= b_gold_move[pos];
 				}
 				break;
 			case 7:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= b_gold_move[pos];
 				}
 				break;
 			case 8:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= BishopMove_h(board, pos, BLACK) & (slope1_mask(pos) | slope2_mask(pos)) | king_move[pos];
 				}
 				break;
 			case 9:
 				while (tempboard)
 				{
-					pos  = BitScan(&tempboard);
+                    _BitScanForward(&pos, tempboard);
+                    tempboard ^= 1 << pos;
 					ret |= RookMove_h(board, pos, BLACK) & (rank_mask(pos) | file_mask(pos)) | king_move[pos];
 				}
 				break;
@@ -793,23 +845,21 @@ U32 GenerateAllMoves (fighter board, U32 apawn, int turn, int type)
 	return ret;
 }
 
-U32 RookMove_h (fighter board, int pos, int turn)
+U32 RookMove_h (fighter &board, int pos, int turn)
 {
 	// upper (find LSB) ; lower (find MSB)
-	U32 ret = 0;
 	U32 occupied = board.b_occupied | board.w_occupied;
 	U32 rank, file;
 	U32 upper, lower;
-	int bitpos;
+	unsigned long bitpos;
 
 	// rank
 	upper = (occupied & rank_upper[pos]) | HIGHTEST_BOARD_POS;
 	lower = (occupied & rank_lower[pos]) | LOWEST_BOARD_POS;
 
-	bitpos = BitScan(&upper);
-	upper  = 1 << (bitpos + 1);
+    upper = (upper & (~upper + 1)) << 1;
 
-	bitpos = BitScanReverse(lower);
+	_BitScanReverse(&bitpos, lower);
 	lower  = 1 << bitpos;
 
 	rank = (upper - lower) & rank_mask(pos);
@@ -818,36 +868,31 @@ U32 RookMove_h (fighter board, int pos, int turn)
 	upper = (occupied & file_upper[pos]) | HIGHTEST_BOARD_POS;
 	lower = (occupied & file_lower[pos]) | LOWEST_BOARD_POS;
 
-	bitpos = BitScan(&upper);
-	upper  = 1 << (bitpos + 1);
+    upper = (upper & (~upper + 1)) << 1;
 
-	bitpos = BitScanReverse(lower);
+    _BitScanReverse(&bitpos, lower);
 	lower  = 1 << bitpos;
 
 	file = (upper - lower) & file_mask(pos);
 
-	ret = rank | file;
-
-	return ret;
+	return rank | file;
 }
 
-U32 BishopMove_h (fighter board, int pos, int turn)
+U32 BishopMove_h (fighter &board, int pos, int turn)
 {
 	// upper (find LSB) ; lower (find MSB)
-	U32 ret = 0;
 	U32 occupied = board.b_occupied | board.w_occupied;	
 	U32 slope1, slope2;
 	U32 upper, lower;
-	int bitpos;
+	unsigned long bitpos;
 
 	// slope1 "/"
 	upper = (occupied & slope1_upper[pos]) | HIGHTEST_BOARD_POS;
 	lower = (occupied & slope1_lower[pos]) | LOWEST_BOARD_POS;
 
-	bitpos = BitScan(&upper);
-	upper = 1 << (bitpos + 1);
+    upper = (upper & (~upper + 1)) << 1;
 
-	bitpos = BitScanReverse(lower);
+    _BitScanReverse(&bitpos, lower);
 	lower = 1 << bitpos;
 
 	slope1 = (upper - lower) & slope1_mask(pos);
@@ -856,19 +901,17 @@ U32 BishopMove_h (fighter board, int pos, int turn)
 	upper = (occupied & slope2_upper[pos]) | HIGHTEST_BOARD_POS;
 	lower = (occupied & slope2_lower[pos]) | LOWEST_BOARD_POS;
 
-	bitpos = BitScan(&upper);
-	upper = 1 << (bitpos + 1);
+    upper = (upper & (~upper + 1)) << 1;
 
-	bitpos = BitScanReverse(lower);
+    _BitScanReverse(&bitpos, lower);
 	lower = 1 << bitpos;
 
 	slope2 = (upper - lower) & slope2_mask(pos);
 
-	ret = slope1 | slope2;
-
-	return ret;
+	return slope1 | slope2;
 }
 
+/*
 int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
 {
 	int ret = 0;
@@ -880,7 +923,7 @@ int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
 		if (turn == WHITE)
 		{
 			temp = board.b_king;
-			pos = BitScan(&temp);
+			pos = _BitScanForward(temp);
 			if ((pos + 5) >= BOARD_SIZE) return ret;
 			if ((board.white_hand & HAND_PAWN1) != 0) 
 			{
@@ -896,7 +939,7 @@ int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
 		else
 		{
 			temp = board.w_king;
-			pos = BitScan(&temp);
+			pos = _BitScanForward(temp);
 			if ((pos - 5) < 0) return ret;
 			if ((board.black_hand & HAND_PAWN1) != 0) 
 			{
@@ -917,11 +960,11 @@ int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
 		if (turn == WHITE)
 		{
 			srcboard = board.w_king;
-			int src = BitScan(&srcboard);
+			int src = _BitScanForward(&srcboard);
 			dstboard = w_king_movement(src);
 			while (dstboard)
 			{
-				int dst = BitScan(&dstboard); // LSB
+				int dst = _BitScanForward(dstboard); // LSB
 				movelist[ret]   |= src;
 				movelist[ret++] |= dst << 6;
 			}
@@ -929,7 +972,7 @@ int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
 		else
 		{
 			srcboard = board.b_king;
-			int src = BitScan(&srcboard);
+			int src = _BitScanForward(&srcboard);
 			dstboard = b_king_movement(src);
 			while (dstboard)
 			{
@@ -943,3 +986,4 @@ int UchifuzumeGenerator(fighter board, U16 *movelist, int turn, int type)
 
 	return ret;
 }
+*/

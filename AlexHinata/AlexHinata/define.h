@@ -28,6 +28,50 @@ typedef unsigned __int8   U8;
 #define b_e_bishop_attack(pos)   ((BishopMove(board, pos, BLACK) | king_move[pos]) & board.w_occupied)
 #define b_e_rook_attack(pos)	 ((RookMove(board, pos, BLACK)   | king_move[pos]) & board.w_occupied)
 
+/*inline U16 pawn_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        w_pawn_move[pos] & board.b_occupied :
+        b_pawn_move[pos] & board.w_occupied;
+}
+inline U16 silver_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        w_silver_move[pos] & board.b_occupied :
+        b_silver_move[pos] & board.w_occupied;
+}
+inline U16 gold_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        w_gold_move[pos] & board.b_occupied :
+        b_gold_move[pos] & board.w_occupied;
+}
+inline U16 bishop_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        BishopMove(board, pos, WHITE) & board.b_occupied :
+        BishopMove(board, pos, BLACK) & board.w_occupied;
+}
+inline U16 rook_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        RookMove(board, pos, WHITE) & board.b_occupied :
+        RookMove(board, pos, BLACK) & board.w_occupied;
+}
+inline U16 king_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        king_move[pos] & board.b_occupied :
+        king_move[pos] & board.w_occupied;
+}
+inline U16 e_bishop_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        (BishopMove(board, pos, WHITE) | king_move[pos]) & board.b_occupied :
+        (BishopMove(board, pos, BLACK) | king_move[pos]) & board.w_occupied;
+}
+inline U16 e_rook_attack(int pos, fighter &board, int turn) {
+    return (turn == WHITE) ?
+        (RookMove(board, pos, WHITE) | king_move[pos]) & board.b_occupied :
+        (RookMove(board, pos, BLACK) | king_move[pos]) & board.w_occupied;
+}
+U16(*attack[])(int pos, fighter &, int) = {
+    nullptr, pawn_attack, silver_attack, gold_attack, bishop_attack, rook_attack, king_attack, nullptr,
+    nullptr, gold_attack, gold_attack, nullptr, e_bishop_attack, e_rook_attack
+};*/
 /*	move	*/
 #define blank_board              (~(board.b_occupied | board.w_occupied) & 0x1ffffff)
 #define w_king_movement(pos)     (king_move[pos]     & blank_board)

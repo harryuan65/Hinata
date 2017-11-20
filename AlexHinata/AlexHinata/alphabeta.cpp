@@ -1,7 +1,7 @@
 #include "head.h"
 
 //U64 max_move = 0;
-
+/*
 int NegaMax (line *pline, fighter *board, int *chessboard, int alpha, int beta, int turn, int depth)
 {
 	line path;
@@ -118,4 +118,4 @@ int AlphaBetaMin(line *pline, fighter *board, int *chessboard, int alpha, int be
 	}
 
 	return bestscore;
-}
+}*/

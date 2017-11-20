@@ -1,28 +1,24 @@
 #include "head.h"
 #include <Windows.h>
 
-void PrintBoard(U32 Board)
-{
-	Board &= 0x1ffffff;
-	int BinaryNum[BOARD_SIZE] = { 0 };
-	int i = 0, j = 0;
-	U32 bitTmp = Board;
-	// 轉換成二元碼
-	while (bitTmp > 1)
-	{
-		BinaryNum[i++] = bitTmp % 2;
-		bitTmp = bitTmp / 2;
-	}
-	BinaryNum[i] = bitTmp;
-	printf("%ld\n", Board);
-	for (i = 0; i <= 20; i += 5)
-	{
-		for (j = 0; j <= 4; j++)
-			printf("%d ", BinaryNum[i + j]);
-		printf("\n");
-	}
-	printf("\n");
-	return;
+void PrintBoard(U32 Board) {
+    for (int i = 0, j; i < 25; i += 5) {
+        for (j = 0; j < 5; ++j)
+            printf("%d ", Board >> (i + j) & 1);
+        puts("");
+    }
+    puts("");
+}
+
+void PrintPV(line path, U32 from, U32 to) {
+    for (U32 i = from; i < to; ++i)
+        printf("%2d : %2d -> %2d eat: %s pro: %s , %s\n",
+            i,
+            path.pv[i] & SRC_MASK,
+            (path.pv[i] & DST_MASK) >> 6,
+            (path.pv[i] & EAT_MASK) ? "Y" : "N",
+            (path.pv[i] >> 13) ? "Y" : "N",
+            (i & 1) ? "white" : "black");
 }
 
 /*
@@ -37,10 +33,10 @@ e_silver =     10     |      26
 e_bishop =     12     |      28
 e_rook   =     13     |      29
 
+	         white          black
 */
 
-void Information(FILE *fptr, double ttime, line pline)
-{
+void Information (FILE *fptr, double ttime, line pline) {
 	printf("time is %.4lf sec.\n", ttime);
 	fprintf(fptr, "time is %.4lf sec.\n", ttime);
 	printf("total nodes are %lld.\n", nodes);
@@ -55,203 +51,56 @@ void Information(FILE *fptr, double ttime, line pline)
 	}*/
 	puts(" \n");
 	fputs(" \n", fptr);
-	return;
+	return ;
 }
 
-void FPrintChessBoard(int *chessboard, FILE *fptr)
-{
-	for (int i = 0; i < CHESS_BOARD_SIZE; i++)
+void FPrintChessBoard(int *chessboard, FILE *fptr) {
+	for (int i = 0; i < CHESS_BOARD_SIZE; ++i)
 		fprintf(fptr, "%c%2d ", (i % 5 ? ' ' : '\n'), chessboard[i]);
 	fprintf(fptr, "\n\n");
 }
 
-#define hConsole GetStdHandle(STD_OUTPUT_HANDLE)
-inline void SetColor(int color = 7)
-{
+static const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+inline void SetColor(int color = 8) {
 	SetConsoleTextAttribute(hConsole, color);
 }
 
+static const char *rank_name[] = { "Ａ", "Ｂ", "Ｃ", "Ｄ", "Ｅ", "Ｆ", "  ", "Ｇ", "  " };
+static const char *showchess[] = {
+    "  ", "步", "銀", "金", "角", "飛", "玉", "  ",
+    "  ", "ㄈ", "全", "  ", "馬", "龍", "  ", "  ",
+    "  ", "步", "銀", "金", "角", "飛", "王", "  ",
+    "  ", "ㄈ", "全", "  ", "馬", "龍",
+};
+void PrintChessBoard(int *chessboard) {
+    int chess;
+    int rank_count = 0;
+    int board_count = 0;
 
-void PrintPV(line path, U32 from, U32 to) {
-	for (U32 i = from; i < to; ++i)
-		printf("%2d : %2d -> %2d eat: %s pro: %s , %s\n",
-			i,
-			path.pv[i] & SRC_MASK,
-			(path.pv[i] & DST_MASK) >> 6,
-			(path.pv[i] & EAT_MASK) ? "Y" : "N",
-			(path.pv[i] >> 13) ? "Y" : "N",
-			(i & 1) ? "white" : "black");
-}
+    SetColor();
+    puts("\n  ｜５｜４｜３｜２｜１｜");
+    for (int i = 0; i < 9; ++i) {
+        puts("—｜—｜—｜—｜—｜—｜—");
+        if (i == 5) puts("  ｜５｜４｜３｜２｜１｜\n");
+        
+        printf("%s", rank_name[rank_count]);
+        for (int j = 0; j < 5; ++j) {
+            printf("｜");
+            chess = chessboard[board_count++];
+            // 12 = 黑 ; 10 = 白 ; 11 = 白升變 ; 13 = 黑升變
+            if (chess & BLACKCHESS) {
+                if (chess & PROMOTE) SetColor(13);
+                else SetColor(12);
+            }
+            else {
+                if (chess & PROMOTE) SetColor(11);
+                else SetColor(10);
+            }
 
-void PrintChessBoard(int *chessboard)
-{
-	char *rank_name[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I" };
-	int rank_count = 0;
-	int board_count = 0;
-	SetColor();
-	puts(" ");//*
-	printf("%2s｜", " ");//*
-	SetColor(15);
-	printf("%2d", 5);
-	SetColor();
-	printf("｜");
-	SetColor(15);
-	printf("%2d", 4);
-	SetColor();
-	printf("｜");
-	SetColor(15);
-	printf("%2d", 3);
-	SetColor();
-	printf("｜");
-	SetColor(15);
-	printf("%2d", 2);
-	SetColor();
-	printf("｜");
-	SetColor(15);
-	printf("%2d", 1);
-	SetColor();
-	puts("｜");
-	for (int i = 0; i < 9; i++)
-	{
-		puts("—｜—｜—｜—｜—｜—｜—\t ｜—｜—｜—｜—｜—｜");
-		if (i == 5)
-		{
-			printf("%2s｜", " ");  //*
-			SetColor(15);
-			printf("%2d", 5);//*
-			SetColor();
-			printf("｜");
-			SetColor(15);
-			printf("%2d", 4);
-			SetColor();
-			printf("｜");
-			SetColor(15);
-			printf("%2d", 3);
-			SetColor();
-			printf("｜");
-			SetColor(15);
-			printf("%2d", 2);
-			SetColor();
-			printf("｜");
-			SetColor(15);
-			printf("%2d", 1);//*
-			SetColor();
-			puts("｜");
-			puts(" \n");
-		}
-		SetColor(15);
-		printf("%2s", rank_name[rank_count]);
-		SetColor();
-		for (int j = 0; j < 5; j++) //128 = 黑 ; 143 = 白  ;207 = 紅底白字  ; 192 = 紅底黑字
-		{
-			printf("｜");
-			switch (chessboard[board_count])
-			{
-			case BLANK:
-				printf("%2s", " ");
-				break;
-			case 1: // white pawn
-				SetColor(143);
-				printf("%2s", "步");
-				break;
-			case 2: // white silver
-				SetColor(143);
-				printf("%2s", "銀");
-				break;
-			case 3: // white gold
-				SetColor(143);
-				printf("%2s", "金");
-				break;
-			case 4: // white bishop
-				SetColor(143);
-				printf("%2s", "角");
-				break;
-			case 5: // white rook
-				SetColor(143);
-				printf("%2s", "飛");
-				break;
-			case 6: // white king
-				SetColor(143);//白色字 現在改黑了
-				printf("%2s", "玉");
-				break;
-			case 9: // white e_pawn
-				SetColor(207);
-				printf("%2s", "ㄈ");
-				break;
-			case 10: // white e_silver
-				SetColor(207);
-				printf("%2s", "全");
-				break;
-			case 12: // white e_bishop
-				SetColor(207);
-				printf("%2s", "馬");
-				break;
-			case 13: // white e_rook
-				SetColor(207);
-				printf("%2s", "龍");
-				break;
-			case 17: // black pawn
-				SetColor(128);
-				printf("%2s", "步");
-				break;
-			case 18: // black silver
-				SetColor(128);
-				printf("%2s", "銀");
-				break;
-			case 19: // black gold
-				SetColor(128);
-				printf("%2s", "金");
-				break;
-			case 20: // black bishop
-				SetColor(128); //黑色字? 現在這我改成白了
-				printf("%2s", "角");
-				break;
-			case 21: // black rook
-				SetColor(128);
-				printf("%2s", "飛");
-				break;
-			case 22: // black king
-				SetColor(128);
-				printf("%2s", "王");
-				break;
-			case 25: // black e_pawn
-				SetColor(192);
-				printf("%2s", "ㄈ");
-				break;
-			case 26: // black e_silver
-				SetColor(192);
-				printf("%2s", "全");
-				break;
-			case 28: // black e_bishop
-				SetColor(192);
-				printf("%2s", "馬");
-				SetColor();
-				break;
-			case 29: // black e_rook
-				SetColor(192);
-				printf("%2s", "龍");
-				break;
-			}
-			SetColor();
-			board_count++;
-		}
-		printf("｜");
-		SetColor(15);
-		printf("%2s", rank_name[rank_count++]);//*
-		SetColor();
-		printf("\t ");
-		int temp = board_count - 1;
-		for (int j = temp - 4; j <= temp; j++)
-		{
-			printf("｜");
-			SetColor(95);
-			printf("%2d", j);
-			SetColor();
-		}
-		printf("｜");
-		puts(" ");		//*
-	}
-	puts(" ");			//*
-
-	return;
+            printf("%s", showchess[chess]);
+            SetColor();
+        }
+        printf("｜%s\n", rank_name[rank_count++]);
+    }
+    puts("");
 }

@@ -1,7 +1,6 @@
 #include "head.h"
 
-long long unsigned int nodes = 0;
-
+/*
 int Minimax (line *pline, fighter *board, int *chessboard, int turn, int depth)
 {
 	line path;
@@ -36,4 +35,4 @@ int Minimax (line *pline, fighter *board, int *chessboard, int turn, int depth)
 	}
 	
 	return m;
-}
+}*/

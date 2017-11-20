@@ -1,5 +1,5 @@
 #include "head.h"
-
+/*
 bool Uchifuzume_Searching (fighter *board, int *chessboard, int turn, int depth)
 {
 	// terminal 
@@ -27,3 +27,4 @@ bool Uchifuzume_Searching (fighter *board, int *chessboard, int turn, int depth)
 
 	return ret;
 }
+*/
