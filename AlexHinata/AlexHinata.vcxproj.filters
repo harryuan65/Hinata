@@ -83,9 +83,6 @@
     <ClCompile Include="scout.cpp">
       <Filter>資源檔</Filter>
     </ClCompile>
-    <ClCompile Include="UchifuzumeSearch.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
     <ClCompile Include="Transposition.cpp">
       <Filter>資源檔</Filter>
     </ClCompile>

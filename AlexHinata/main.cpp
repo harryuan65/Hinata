@@ -4,11 +4,11 @@ bool isFullFailHigh = false;
 U64 nodes;
 U64 failed_nodes;
 U64 leave_nodes;
-U64 depth2_nodes;
 HistoryHeuristic mHistoryHeur;
 Transposition mTransposition;
 
-void CustomBoard(Bitboard mBitboard, int* chessboard) {
+void CustomBoard(Bitboard& mBitboard, int* chessboard) {
+	/*
 	// 黑棋 上
 	chessboard[D5] = ROOK | 0x10;
 	chessboard[A1] = KING | 0x10;
@@ -26,7 +26,24 @@ void CustomBoard(Bitboard mBitboard, int* chessboard) {
 	chessboard[F3] = BISHOP;
 	chessboard[H3] = BISHOP | 0x10;
 	chessboard[I2] = PAWN | 0x10;
+	*/
+	// 黑棋 上
+	chessboard[A2] = GOLD | 0x10;
+	chessboard[B4] = KING | 0x10;
 
+	// 白棋 下
+	chessboard[C3] = BISHOP;
+	chessboard[D3] = SILVER;
+	chessboard[D5] = PAWN;
+	chessboard[E4] = KING;
+
+	//手牌
+	chessboard[F1] = GOLD;
+	chessboard[G2] = PAWN;
+	chessboard[H5] = ROOK | 0x10;
+	chessboard[H4] = ROOK | 0x10;
+	chessboard[H3] = BISHOP | 0x10;
+	chessboard[I4] = SILVER | 0x10;
 	SetBitboard(mBitboard, chessboard);
 }
 
@@ -61,14 +78,9 @@ int main (int argc, char *argv[])
 	printf("請選擇對手:\n(0)玩家vs電腦\n(1)電腦vs玩家\n(2)玩家對打\n(3)電腦對打\n(4)電腦對打 本機vs其他程式\n(5)電腦對打 其他程式vs本機\n");
     scanf("%d", &gameMode);
 	if (gameMode == 4 || gameMode == 5) {
-		printf("你的hwnd是 %d\n", GetConsoleWindow());
-		printf("請輸入目標程式的hwnd : ");
+		cout << "你的hwnd是 "<< GetConsoleWindow() << endl;
+		cout << "請輸入目標程式的hwnd : ";
 		scanf("%d", &hwnd);
-		/*if (!hwnd) {
-			cout << "FindWindow Failed" << endl;
-			system("pause");
-			return 0;
-		}*/
 	}
 	switch (gameMode)
 	{
@@ -91,10 +103,11 @@ int main (int argc, char *argv[])
 		break;
 	}
 	
-	while (1) {
+	// Game Loop
+	while (pvEvaluate != -CHECKMATE) {
 		printf("\n---------Step %d Player %d turn---------\n", step, turn);
 		PrintChessBoard(chessboard);
-		printf("Zobrist Number %lu\n", mTransposition.ZobristHashing(chessboard));
+		//printf("Zobrist Number %lu\n", mTransposition.ZobristHashing(chessboard));
 		if (player[turn] == HUMAN) {
 			int src = 0, dst = 0, eat = 0, pro = 0;
 			char srcStr[2], dstStr[2];
@@ -102,9 +115,7 @@ int main (int argc, char *argv[])
 			while(1) {
 				printf("輸入你的移動動作 (FromPos ToPos IsPromote) : ");
 				_flushall();
-				scanf(" %2c", &srcStr);
-				scanf(" %2c", &dstStr);
-				scanf(" %d", &pro);
+				cin >> srcStr >> dstStr >> pro;
 				src = boardpos2index(toupper(srcStr[0]), srcStr[1]);
 				dst = boardpos2index(toupper(dstStr[0]), dstStr[1]);
 				if (src != -1 && dst != -1 && pro <= 1 && pro >= 0) {
@@ -122,7 +133,7 @@ int main (int argc, char *argv[])
 
 			// AI moving
 			clock_t begin = clock();
-			if (action != path.pv[++pvCount] || pvCount > 6) {
+			if (action != path.pv[++pvCount] || pvCount > 3) {
 				pvCount = 0;
 				pvEvaluate = NegaScout(&path, &mBitboard, chessboard, -INF, INF, turn, LIMIT_DEPTH, false);
 			}
@@ -135,7 +146,6 @@ int main (int argc, char *argv[])
 			// Print Result
 			printf("\n");
 			PrintPV(path, pvCount, path.pv_count);
-			//printf("Depth2 Failed-High Node : %d\n", depth2_nodes);
 			printf(
 				"Total Nodes       : %11llu\n"
 				"Failed-High Nodes : %11llu\n"
@@ -147,7 +157,6 @@ int main (int argc, char *argv[])
 				nodes, failed_nodes, leave_nodes, durationTime,
 				(durationTime ? nodes / durationTime : 0), Evaluate(chessboard), pvEvaluate);
 			nodes = 0;
-			//depth2_nodes = 0;
 			failed_nodes = 0;
 			leave_nodes = 0;
 			mHistoryHeur.SaveTable();
@@ -169,7 +178,8 @@ int main (int argc, char *argv[])
 		turn ^= 1;
 		step++;
 	}
-
+	cout << "Game Over" << endl;
+	system("pause");
 	return 0;
 }
 

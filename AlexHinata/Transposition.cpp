@@ -17,11 +17,11 @@ Transposition::Transposition() {
 
 U32 Transposition::ZobristHashing(const int* chessboard) {
 	U32 hashcode = 0;
-	for (int i = 0; i < 45; i++) {
+	/*for (int i = 0; i < 35; i++) {
 		if (chessboard[i] != BLANK) {
 			hashcode ^= m_zobristTable[chessboard[i] * 45 + i];
 		}
-	}
+	}*/
 	return hashcode;
 }
 
@@ -55,7 +55,7 @@ bool Transposition::SaveTable() {
 
 void Transposition::InitZobristTable(int seed) {
 	for (int i = 0; i < ZOBRIST_SIZE; i++) {
-		m_zobristTable[i] = rand() & HASHVALUE_MASK;
+		m_zobristTable[i] = rand();
 	}
 	return;
 }

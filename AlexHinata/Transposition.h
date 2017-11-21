@@ -2,10 +2,9 @@
 #define _TRANSPOSITION_
 
 #define ZOBRIST_SEED        10      // 亂數種子
-#define ZOBRIST_SIZE        32 * 45 // Zobrist Table 大小  棋子種類*45+位置
-//#define ZOBRIST_NUMBER_SIZE 1 << 24 // 亂數大小
-//#define TRANSPOSITION_SIZE  1 << 24 // 同形表 大小
-#define HASHVALUE_MASK      0x00FFFFFF
+#define ZOBRIST_SIZE        30 * 35 // Zobrist Table 大小  棋子種類*35+位置
+//#define ZOBRIST_NUMBER_SIZE 1 << 32 // 亂數大小
+//#define TRANSPOSITION_SIZE  1 << 32 // 同形表 大小
 #define TRANSPOSITION_FILE_NAME "transposition_table.txt"
 #include "head.h"
 

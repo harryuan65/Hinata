@@ -168,7 +168,6 @@
     <ClCompile Include="read board.cpp" />
     <ClCompile Include="scout.cpp" />
     <ClCompile Include="Transposition.cpp" />
-    <ClCompile Include="UchifuzumeSearch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
