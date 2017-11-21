@@ -8,15 +8,17 @@
 
 class HistoryHeuristic
 {
-private:
-	bool m_isEnable;
 public:
-	HistoryHeuristic(bool isEnable);
+	HistoryHeuristic();
 	bool SaveTable();
 	void OverflowAvoid();
 	void SortByTable(U16* moveList, int size);
 	void UpdateTable(U16 moveAction, int delta);
 
+	bool m_isEnable;
+	bool m_isUpdate;
+
+private:
 	U32 table[HISTORY_TABLE_SIZE] = { 0 };
 };
 

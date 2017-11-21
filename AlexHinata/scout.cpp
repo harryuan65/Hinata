@@ -45,9 +45,6 @@ int NegaScout(line *mPVAction, Bitboard *mBitboard, int *chessboard, int alpha, 
         for (int j = 0; j < cnt; j++) {
             U16 capture = DoMove(movelist[j], mBitboard, chessboard, turn);
 			int score = -NegaScout(&tmpPVAction, mBitboard, chessboard, -nullAlpha, -max(alpha, bestscore), 1 - turn, depth - 1, isFailHigh);
-			if (depth == 1) { // DEBUG:
-				printf("%d\nullAlpha", score);
-			}
 			// Failed-High
             if (score > bestscore) {
 				if (nullAlpha == beta || (depth < 3 && !isFullFailHigh) || score >= beta) {
@@ -64,11 +61,7 @@ int NegaScout(line *mPVAction, Bitboard *mBitboard, int *chessboard, int alpha, 
 			// Cut off
 			if (bestscore >= beta) {
 				// Update History Heuristic Table
-				int index = Action2Index(movelist[j]);
-				if (mHistoryHeur.table[index] >> 31) {
-					mHistoryHeur.OverflowAvoid();
-				}
-				mHistoryHeur.table[index] += 1 << depth;
+				mHistoryHeur.UpdateTable(movelist[j], 1 << depth);
 				return bestscore;
 			}
 			// Set up a null window

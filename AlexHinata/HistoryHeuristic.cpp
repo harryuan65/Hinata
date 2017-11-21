@@ -1,11 +1,9 @@
 #include "head.h"
 
-HistoryHeuristic::HistoryHeuristic(bool isEnable)
+HistoryHeuristic::HistoryHeuristic()
 {
-	m_isEnable = isEnable;
-	if (!m_isEnable) {
-		return;
-	}
+	m_isEnable = true;
+	m_isUpdate = true;
 	FILE *file = fopen(HISTORY_FILE_NAME, "r");
 	if (file != NULL) {
 		printf("Loading %s\n", HISTORY_FILE_NAME);
@@ -55,9 +53,12 @@ void HistoryHeuristic::SortByTable(U16* moveList, int size) {
 }
 
 void HistoryHeuristic::UpdateTable(U16 moveAction, int delta) {
-	int index = Action2Index(moveAction);
-	if (mHistoryHeur.table[index] >> 31) {
-		mHistoryHeur.OverflowAvoid();
+	if (!m_isEnable || !m_isUpdate) {
+		return;
 	}
-	mHistoryHeur.table[index] += delta;
+	int index = Action2Index(moveAction);
+	if (table[index] >> 31) {
+		OverflowAvoid();
+	}
+	table[index] += delta;
 }

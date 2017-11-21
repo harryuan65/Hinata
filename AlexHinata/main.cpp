@@ -1,12 +1,12 @@
 #include "head.h"
 
-bool isFullFailHigh;
+bool isFullFailHigh = false;
 U64 nodes;
 U64 failed_nodes;
 U64 leave_nodes;
 U64 depth2_nodes;
-HistoryHeuristic mHistoryHeur(true);
-Transposition mTransposition(true);
+HistoryHeuristic mHistoryHeur;
+Transposition mTransposition;
 
 void CustomBoard(Bitboard mBitboard, int* chessboard) {
 	// 黑棋 上
@@ -32,25 +32,6 @@ void CustomBoard(Bitboard mBitboard, int* chessboard) {
 
 int main (int argc, char *argv[])
 {
-	/*int chessboard[CHESS_BOARD_SIZE] = {BLANK};
-	Bitboard mBitboard = {BLANK};
-	char save[50];
-	FILE *fptr;
-	line path;
-
-	_mkdir ("X:\\Hinata\\player1");
-	sprintf(save, "X:\\Hinata\\player1\\pv_move.txt"); 
-	fptr = fopen(save, "w");
-	ReadBoard(chessboard, &mBitboard, 0);
-	//PrintChessBoard(chessboard);
-	nodes = 0;
-	path.pv_count = 0;
-	memset(path.pv, BLANK, (LIMIT_DEPTH + 1));
-	int s = NegaScout(&path, &mBitboard, chessboard, -INF, INF, WHITE, LIMIT_DEPTH);
-	for (int i = 0; i < path.pv_count; i++)
-		fprintf(fptr, "%2d - %2d\n", path.pv[i] & SRC_MASK, (path.pv[i] & DST_MASK) >> 6);
-
-	fclose(fptr);*/
 	int chessboard[CHESS_BOARD_SIZE] = {BLANK};
 	Bitboard mBitboard = {BLANK};
 	line path;
@@ -60,22 +41,43 @@ int main (int argc, char *argv[])
 	int step = 1;
 	int pvCount = 0;
 	int pvEvaluate = 0;
+	int gameMode;
 	double durationTime = 0;
+	HWND hwnd;
 
 	// Inital or Custom Board
 	Inital(&mBitboard, chessboard);
 	//CustomBoard(mBitboard, chessboard);
 
-	printf("DEBUG : Full FailHigh?(true : 1/ false : 0)");
-	scanf("%d", &isFullFailHigh);
-	printf("請選擇先後手 (0)先手 (1)後手 (2)玩家對打 (3)電腦對打 \n");
-    scanf("%d", &player[0]);
-	switch (player[0])
+	//printf("DEBUG : Full FailHigh?(true : 1/ false : 0)");
+	//scanf("%d", &isFullFailHigh);
+	bool boolbuf;
+	printf("DEBUG : isHistoryEnable?(true : 1/ false : 0)");
+	scanf("%d", &boolbuf);
+	mHistoryHeur.m_isEnable = boolbuf;
+	printf("DEBUG : isHistoryUpdate?(true : 1/ false : 0)");
+	scanf("%d", &boolbuf);
+	mHistoryHeur.m_isUpdate = boolbuf;
+	printf("請選擇對手:\n(0)玩家vs電腦\n(1)電腦vs玩家\n(2)玩家對打\n(3)電腦對打\n(4)電腦對打 本機vs其他程式\n(5)電腦對打 其他程式vs本機\n");
+    scanf("%d", &gameMode);
+	if (gameMode == 4 || gameMode == 5) {
+		printf("你的hwnd是 %d\n", GetConsoleWindow());
+		printf("請輸入目標程式的hwnd : ");
+		scanf("%d", &hwnd);
+		/*if (!hwnd) {
+			cout << "FindWindow Failed" << endl;
+			system("pause");
+			return 0;
+		}*/
+	}
+	switch (gameMode)
 	{
 	case 0:
+	case 5:
 		player[0] = HUMAN; player[1] = AI;
 		break;
 	case 1:
+	case 4:
 		player[0] = AI; player[1] = HUMAN;
 		break;
 	case 2:
@@ -149,6 +151,20 @@ int main (int argc, char *argv[])
 			failed_nodes = 0;
 			leave_nodes = 0;
 			mHistoryHeur.SaveTable();
+			if (gameMode == 4 || gameMode == 5) {
+				char src[3] = "  ", dst[3] = "  ";
+				index2boardpos(path.pv[pvCount] & SRC_MASK, src);
+				index2boardpos((path.pv[pvCount] & DST_MASK) >> 6, dst);
+				PostMessage(hwnd, WM_KEYDOWN, src[0], 0);
+				PostMessage(hwnd, WM_KEYDOWN, src[1], 0);
+				PostMessage(hwnd, WM_KEYDOWN, VK_SPACE, 0);
+				PostMessage(hwnd, WM_KEYDOWN, dst[0], 0);
+				PostMessage(hwnd, WM_KEYDOWN, dst[1], 0);
+				PostMessage(hwnd, WM_KEYDOWN, VK_SPACE, 0);
+				PostMessage(hwnd, WM_KEYDOWN, (bool)(path.pv[pvCount] >> 13) + '0', 0);
+				PostMessage(hwnd, WM_KEYDOWN, VK_RETURN, 0);
+			}
+			printf("\a");
 		}
 		turn ^= 1;
 		step++;

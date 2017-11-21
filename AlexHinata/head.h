@@ -3,9 +3,10 @@
 
 using namespace std;
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <assert.h>
 #include <time.h>
 #include <direct.h>
@@ -15,6 +16,7 @@ using namespace std;
 #include <map>
 #include <algorithm>
 #include <random>
+#include <windows.h>
 #include "define.h"
 #include "change.h"
 #include "library.h"

@@ -1,10 +1,7 @@
 #include "head.h"
 
-Transposition::Transposition(bool isEnable) {
-	m_isEnable = isEnable;
-	if (!m_isEnable) {
-		return;
-	}
+Transposition::Transposition() {
+	m_isEnable = true;
 	FILE *file = fopen(TRANSPOSITION_FILE_NAME, "r");
 	if (file != NULL) {
 		printf("Loading %s\n", TRANSPOSITION_FILE_NAME);
@@ -29,7 +26,7 @@ U32 Transposition::ZobristHashing(const int* chessboard) {
 }
 
 U32 Transposition::ZobristHashingByAction(const int* chessboard, U32 hashcode, U16 action) {
-	int srcChess = action & SRC_CHESS_MASK;
+	/*int srcChess = action & SRC_CHESS_MASK;
 	int srcIndex = action & SRC_MASK;
 	int dstChess = action & DST_CHESS_MASK;
 	int dstIndex = action & DST_MASK;
@@ -38,7 +35,7 @@ U32 Transposition::ZobristHashingByAction(const int* chessboard, U32 hashcode, U
 		hashcode ^= m_zobristTable[dstChess * 45 + dstIndex];
 		hashcode ^= m_zobristTable[dstChess * 45 + (dstChess-1) & 0x7 + 5 * (dstChess >> 3)];
 	}
-	hashcode ^= m_zobristTable[srcChess * 45 + dstIndex];
+	hashcode ^= m_zobristTable[srcChess * 45 + dstIndex];*/
 	return hashcode;
 }
 

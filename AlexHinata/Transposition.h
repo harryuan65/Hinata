@@ -12,15 +12,14 @@
 
 class Transposition {
 public:
-	Transposition(bool isEnable);
+	Transposition();
 	bool SaveTable(); // 儲存同形表到檔案裡
 	U32 ZobristHashing(const int* chessboard); // 回傳 Hash Code
 	U32 ZobristHashingByAction(const int* chessboard, U32 hashcode, U16 action); // 回傳 Hash Code
 
+	bool m_isEnable; // 是否啟用同形表
 private:
 	void InitZobristTable(int seed); // 初始化一個亂數 Zobrist Table
-	
-	bool m_isEnable; // 是否啟用同形表
 	U32 m_zobristTable[ZOBRIST_SIZE];
 	//map<int, TranspositionData> m_transpositionTables;
 };
