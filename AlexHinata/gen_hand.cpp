@@ -245,7 +245,7 @@ void HandGenerator(int *start, Bitboard board, U16 *movelist, int turn)
 
 	return ;
 }
-
+/*
 void HandGenerator_s(int *start, Bitboard board, int *chessboard, U16 *movelist, int turn)
 {
 	// start is movelist which it starts from.
@@ -577,7 +577,7 @@ void HandGenerator_s(int *start, Bitboard board, int *chessboard, U16 *movelist,
 
 	return ;
 }
-
+*/
 U32 Uchifuzume (Bitboard board, int turn)
 {
 	U32 ret = FULL_BOARD;

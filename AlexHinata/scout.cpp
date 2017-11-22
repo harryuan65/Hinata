@@ -24,9 +24,12 @@ int NegaScout(line *mPVAction, Bitboard *mBitboard, int *chessboard, int alpha, 
 	// 深度為0 回傳
 	if (depth == 0) {
 		mPVAction->pv_count = 0;
-		if (!isFailHigh)
-			leave_nodes++;
-		return QuiescenceSearch(mBitboard, chessboard, alpha, beta, turn);
+		//cout << nodes << endl; 
+		//int tmp = QuiescenceSearch(mBitboard, chessboard, alpha, beta, turn, isFailHigh);
+		//cout << nodes << endl;
+		//return tmp;
+		//return (turn == WHITE) ? Evaluate(chessboard) : -Evaluate(chessboard);
+		return QuiescenceSearch(mBitboard, chessboard, alpha, beta, turn, isFailHigh);
 	}
 
 	// 分三個步驟搜尋 [攻擊 移動 打入]

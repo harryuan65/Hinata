@@ -59,8 +59,8 @@ int NegaMax      (line *pline, Bitboard *board, int *chessboard, int alpha, int 
 int ScoutMax     (line *pline, Bitboard *board, int *chessboard, int alpha, int beta, int turn, int depth);
 int ScoutMin     (line *pline, Bitboard *board, int *chessboard, int alpha, int beta, int turn, int depth);
 int NegaScout    (line *pline, Bitboard *board, int *chessboard, int alpha, int beta, int turn, int depth, bool isFailHigh);
-int QuiescenceSearch (Bitboard *board, int *chessboard, int alpha, int beta, int turn);
-bool Uchifuzume_Searching (Bitboard *board, int *chessboard, int turn, int depth);
+int QuiescenceSearch (Bitboard *board, int *chessboard, int alpha, int beta, int turn, bool isFailHigh);
+//bool Uchifuzume_Searching (Bitboard *board, int *chessboard, int turn, int depth);
 
 /*	evaluating function	*/
 int Evaluate (int *chessboard);

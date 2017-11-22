@@ -4,6 +4,7 @@ bool isFullFailHigh = false;
 U64 nodes;
 U64 failed_nodes;
 U64 leave_nodes;
+U64 quiet_nodes;
 HistoryHeuristic mHistoryHeur;
 Transposition mTransposition;
 
@@ -69,12 +70,12 @@ int main (int argc, char *argv[])
 	//printf("DEBUG : Full FailHigh?(true : 1/ false : 0)");
 	//scanf("%d", &isFullFailHigh);
 	bool boolbuf;
-	printf("DEBUG : isHistoryEnable?(true : 1/ false : 0)");
-	scanf("%d", &boolbuf);
-	mHistoryHeur.m_isEnable = boolbuf;
-	printf("DEBUG : isHistoryUpdate?(true : 1/ false : 0)");
-	scanf("%d", &boolbuf);
-	mHistoryHeur.m_isUpdate = boolbuf;
+	//printf("DEBUG : isHistoryEnable?(true : 1/ false : 0)");
+	//scanf("%d", &boolbuf);
+	mHistoryHeur.m_isEnable = false;
+	//printf("DEBUG : isHistoryUpdate?(true : 1/ false : 0)");
+	//scanf("%d", &boolbuf);
+	mHistoryHeur.m_isUpdate = false;
 	printf("請選擇對手:\n(0)玩家vs電腦\n(1)電腦vs玩家\n(2)玩家對打\n(3)電腦對打\n(4)電腦對打 本機vs其他程式\n(5)電腦對打 其他程式vs本機\n");
     scanf("%d", &gameMode);
 	if (gameMode == 4 || gameMode == 5) {
@@ -150,15 +151,17 @@ int main (int argc, char *argv[])
 				"Total Nodes       : %11llu\n"
 				"Failed-High Nodes : %11llu\n"
 				"Leave Nodes       : %11llu\n"
+				"Search Quiet Nodes: %11llu\n"
 				"Time              : %14.2lf\n"
 				"Node/s            : %14.2lf\n"
 				"Evaluate          : %11d\n"
 				"PV leaf Evaluate  : %11d\n",
-				nodes, failed_nodes, leave_nodes, durationTime,
+				nodes, failed_nodes, leave_nodes, quiet_nodes, durationTime,
 				(durationTime ? nodes / durationTime : 0), Evaluate(chessboard), pvEvaluate);
 			nodes = 0;
 			failed_nodes = 0;
 			leave_nodes = 0;
+			quiet_nodes = 0;
 			mHistoryHeur.SaveTable();
 			if (gameMode == 4 || gameMode == 5) {
 				char src[3] = "  ", dst[3] = "  ";

@@ -30,6 +30,7 @@ extern bool isFullFailHigh;
 extern U64 nodes;
 extern U64 failed_nodes;
 extern U64 leave_nodes;
+extern U64 quiet_nodes;
 extern HistoryHeuristic mHistoryHeur;
 
 #endif
