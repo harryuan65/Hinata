@@ -1,98 +1,139 @@
+// NEED DEBUG : Zobrist Hashing 同構, 同形表的位元轉換, Domove, Undomove
 #include "head.h"
+U64 nnnn = 0;
 
-bool isFailHigh;
-U64 nodes = 0;
-U64 failed_nodes = 0;
-U64 leave_nodes = 0;
+int main() {
+    Board m_Board;
+    Action action;
+    int player[2];
+    int gameMode;
+    HWND hwnd;
 
-U16 input(int *chessboard, int turn) {
-    int src = 0, dst = 0, eat = 0, pro = 0;
-    fscanf_s(stdin, "%d %d %d", &src, &dst, &pro);
-    if (!chessboard[src] || chessboard[src] >> 4 != turn) return 0;
-    if (chessboard[dst]) eat = 1;
-    return (pro << 13) | (eat << 12) | (dst << 6) | src;
-}
-
-int main (int argc, char *argv[])
-{
-	/*int chessboard[CHESS_BOARD_SIZE] = {BLANK};
-	fighter board = {BLANK};
-	char save[50];
-	FILE *fptr;
-	line path;
-
-	_mkdir ("X:\\Hinata\\player1");
-	sprintf(save, "X:\\Hinata\\player1\\pv_move.txt"); 
-	fptr = fopen(save, "w");
-	ReadBoard(chessboard, &board, 0);
-	//PrintChessBoard(chessboard);
-	nodes = 0;
-	path.pv_count = 0;
-	memset(path.pv, BLANK, (LIMIT_DEPTH + 1));
-	int s = NegaScout(&path, &board, chessboard, -INF, INF, WHITE, LIMIT_DEPTH);
-	for (int i = 0; i < path.pv_count; i++)
-		fprintf(fptr, "%2d - %2d\n", path.pv[i] & SRC_MASK, (path.pv[i] & DST_MASK) >> 6);
-
-	fclose(fptr);*/
-	int chessboard[CHESS_BOARD_SIZE] = {BLANK};
-	fighter board = {BLANK};
-	line path;
-	int turn = WHITE;
-    U16 movebuf = 4096;
-	int pvcount = 0;
-    int pvEvaluate = 0;
-    double durationTime = 0;
-	Inital(&board, chessboard);
-
-	PrintChessBoard(chessboard);
-	printf("請選擇先後手 0: 先手 1: 後手 2: 膀胱者 \n");
-	_flushall();
-	int player;
-    scanf_s("%d", &player); getchar();
-	if (player != WHITE && player != BLACK && player != SPEC) return 0;
-	
-	double elapsed_secs = 0, accumulate = 0;
-	while(true) {
-        if (turn == player) {
-            printf("Your turn!\n\a");
-            _flushall();
-            while (!(movebuf = input(chessboard, turn)))
-                puts("Invalid Input! Please try again!");
-            DoMove(movebuf, &board, chessboard, player);
-            PrintChessBoard(chessboard);
+    for (;;) {
+        cout << "請選擇對手:\n(0)玩家vs電腦\n(1)電腦vs玩家\n(2)玩家對打\n(3)電腦對打\n(4)電腦對打 本機vs其他程式\n(5)電腦對打 其他程式vs本機\n";
+        cin >> gameMode;
+        if (gameMode == 4 || gameMode == 5) {
+            cout << "你的hwnd是 " << (int)GetConsoleWindow() << endl;
+            cout << "請輸入目標程式的hwnd : ";
+            scanf_s("%d", &hwnd);
         }
-        else {
-            printf("AI thinking...\n");
+        switch (gameMode)
+        {
+        case 0:
+            player[0] = HUMAN_CTRL; player[1] = AI_CTRL;
+            break;
+        case 1:
+            player[0] = AI_CTRL; player[1] = HUMAN_CTRL;
+            break;
+        case 2:
+            player[0] = HUMAN_CTRL; player[1] = HUMAN_CTRL;
+            break;
+        case 3:
+            player[0] = AI_CTRL; player[1] = AI_CTRL;
+            break;
+        case 4:
+            player[0] = AI_CTRL; player[1] = OTHERAI_CTRL;
+            break;
+        case 5:
+            player[0] = OTHERAI_CTRL; player[1] = AI_CTRL;
+            break;
+        default:
+            continue;
+        }
+        break;
+    }
 
+    /*int choice;
+    cout << "自訂棋盤?0:1 = ";
+    while (cin >> choice && choice != 0 && choice != 1);
+    if (choice) {
+        cout << "黑步 17 | 黑銀 18 | 黑金 19 | 黑角 20 | 黑車 21 | 黑王 22" << endl;
+        cout << "白步  1 | 白銀  2 | 白金  3 | 白角  4 | 白車  5 | 白王  6" << endl << endl;
+        cout << "升變 + 8" << endl;
+        cout << "手排: 步 | 銀 | 金 | 角 | 車 的順序輸入 0~2 (可選)" << endl;
+        cout << "請輸入 25 個數字 (+ 黑白 10 個手排)，並以 '.' 結尾 :" << endl;
+        char s[128];
+        cin.clear(); cin.ignore(128, '\n');
+        cin.getline(s, 128, '.'); // 直到句點結束，所以可以斷行
+        m_Board.Initialize(s);
+    }
+    else */m_Board.Initialize();
+
+    while (!m_Board.IsGameOver()) {
+        /*cout << (m_Board.GetTurn() ? "GREEN" : "RED") << " turn\n";
+        Action moveList[128] = { 0 };
+        U32 cnt = 0;
+        AttackGenerator(m_Board, moveList, cnt);
+        cout << "Atta cnt : " << cnt << "\n";
+        cnt = 0;
+        MoveGenerator(m_Board, moveList, cnt);
+        cout << "Move cnt : " << cnt << "\n";
+        cnt = 0;
+        HandGenerator(m_Board, moveList, cnt);
+        cout << "Hand cnt : " << cnt << "\n";*/
+
+        m_Board.PrintChessBoard();
+
+        /*cout << "是否紀錄 ? : (否: 0 / 存: 1 / 讀 : 2)\n";
+        while (cin >> choice && choice != 0 && choice != 1 && choice != 2);
+        if (choice == 1) {
+            m_Board.SaveBoard("board.txt");
+            continue;
+        }
+        else if (choice == 2) {
+            m_Board.LoadBoard("board.txt");
+            continue;
+        }*/
+
+        if (player[m_Board.GetTurn()] == HUMAN_CTRL) {
+            while (!(action = Human_DoMove(m_Board)));
+        }
+        else if (player[m_Board.GetTurn()] == AI_CTRL) {
             clock_t begin = clock();
-            if (movebuf != path.pv[++pvcount]) {
-                pvcount = 0;
-                pvEvaluate = NegaScout(&path, &board, chessboard, -INF, INF, turn, LIMIT_DEPTH, isFailHigh);
+            if (!(action = AI_DoMove(m_Board))) {
+                cout << "Checkmate! I'm lose";
+                system("pause");
+                break;
             }
-            else
-                ++pvcount;
-            DoMove(path.pv[pvcount], &board, chessboard, turn);
-            durationTime = double(clock() - begin) / CLOCKS_PER_SEC;
-
-            // Print Result
-            PrintPV(path, pvcount, path.pv_count);
-            printf(
+            double durationTime = double(clock() - begin) / CLOCKS_PER_SEC;
+            printf("\a"
                 "Total Nodes       : %11llu\n"
                 "Failed-High Nodes : %11llu\n"
                 "Leave Nodes       : %11llu\n"
                 "Time              : %14.2lf\n"
                 "Node/s            : %14.2lf\n"
                 "Evaluate          : %11d\n"
-                "PV leaf Evaluate  : %11d\n",
+                "PV leaf Evaluate  : %11d\n"
+                "cut illgal move   : %11d\n",
                 nodes, failed_nodes, leave_nodes, durationTime,
-                (durationTime ? nodes / durationTime : 0), Evaluate(chessboard), pvEvaluate);
+                (durationTime ? nodes / durationTime : 0),
+                m_Board.Evaluate(),
+                pvEvaluate, nnnn);
+
+            if (gameMode == 4 || gameMode == 5) {
+                stringstream ss;
+                ss << action;
+                cout << "Send:" << ss.str() << endl;
+                for (int i = 0; i < ss.str().length(); i++) {
+                    PostMessage(hwnd, WM_KEYDOWN, ss.str()[i], 0);
+                }
+                PostMessage(hwnd, WM_KEYDOWN, VK_RETURN, 0);
+            }
+
             nodes = 0;
             failed_nodes = 0;
             leave_nodes = 0;
+            nnnn = 0;
         }
-        turn ^= 1;
-	}
+        else {
+            cin >> action;
+        }
 
-	return 0;
+        m_Board.DoMove(action);
+    }
+
+    cout << "Game Over!";
+    cout << (m_Board.GetTurn() ? "White" : "Black") << " Win";
+    system("pause");
+    return 0;
 }
-

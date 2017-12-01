@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="change.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
     <ClInclude Include="define.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="evaluate.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="function.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="head.h">
@@ -33,61 +24,19 @@
     <ClInclude Include="library.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="move.h">
+    <ClInclude Include="AI.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alphabeta.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="bitscan.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="change.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="evaluate.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="gen_hand.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="gen_move.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="gen_pro.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="hash.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="initial.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>資源檔</Filter>
+      <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="minimax.cpp">
-      <Filter>資源檔</Filter>
+    <ClCompile Include="AI.cpp">
+      <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="move.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="print bit board.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="quiet.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="read board.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="scout.cpp">
-      <Filter>資源檔</Filter>
-    </ClCompile>
-    <ClCompile Include="UchifuzumeSearch.cpp">
-      <Filter>資源檔</Filter>
+    <ClCompile Include="board.cpp">
+      <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
