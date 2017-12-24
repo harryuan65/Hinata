@@ -2,13 +2,10 @@
 #define _AI_
 #include "head.h"
 
-struct TranspositNode;
-class Board;
-
-Action IDAS(Board& board, bool turn);
+Action IDAS(Board& board, bool turn, PV &pv);
 int NegaScout(PV &pv, Board& board, int alpha, int beta, int depth, int turn, bool isFailHigh);
-int QuiescenceSearch(Board& board, int alpha, int beta, int turn);
-int SEE(int dstIndex, int turn);
+int QuiescenceSearch(Board& board, int alpha, int beta);
+int SEE(const Board &board, int dstIndex);
 
 /* Transposition Table */
 bool ReadTransposit(U32 hashcode, TranspositNode& bestNode);

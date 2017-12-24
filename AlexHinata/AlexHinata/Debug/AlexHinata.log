@@ -1,13 +1,6 @@
-﻿  main.cpp
-main.cpp(110): warning C4018: '<': signed/unsigned 不相符
-main.cpp(18): warning C4477: 'scanf_s' : 格式字串 '%d' 需要 'int *' 類型的引數，但 variadic 引數 1 的類型為 'HWND *'
-main.cpp(92): warning C4477: 'printf' : 格式字串 '%11d' 需要 'int' 類型的引數，但 variadic 引數 8 的類型為 'U64'
-  main.cpp(92): note: 請考慮在格式字串中使用 '%lld'
-  main.cpp(92): note: 請考慮在格式字串中使用 '%I64d'
-  正在產生程式碼
-  33 of 456 functions ( 7.2%) were compiled, the rest were copied from previous compilation.
-    19 functions were new in current compilation
-    69 functions had inline decision re-evaluated but remain unchanged
-  已完成程式碼產生
+﻿  board.cpp
+d:\project\hinata\alexhinata\alexhinata\board.cpp(537): warning C4700: 使用了未初始化的區域變數 'handcnt'
+AI.obj : warning LNK4075: 忽略 '/EDITANDCONTINUE'，由於 '/OPT:ICF' 規格
+  LINK : 指定了 /LTCG，但未要求程式碼產生，請從連結命令列移除 /LTCG 以提升連結器效能
   AlexHinata.vcxproj -> D:\Project\Hinata\AlexHinata\Debug\AlexHinata.exe
   AlexHinata.vcxproj -> D:\Project\Hinata\AlexHinata\Debug\AlexHinata.pdb (Partial PDB)

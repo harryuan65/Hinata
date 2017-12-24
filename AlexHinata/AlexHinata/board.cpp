@@ -1,9 +1,8 @@
-#include "board.h"
-#include <Windows.h>
+ï»¿#include "board.h"
 #ifdef WINDOWS_10
-#define LINE_STRING "¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X¡U¡X"
+#define LINE_STRING "â€”ï½œâ€”ï½œâ€”ï½œâ€”ï½œâ€”ï½œâ€”ï½œâ€”"
 #else
-#define LINE_STRING "¡X¢q¡X¢q¡X¢q¡X¢q¡X¢q¡X¢q¡X"
+#define LINE_STRING "â€”â”¼â€”â”¼â€”â”¼â€”â”¼â€”â”¼â€”â”¼â€”"
 #endif
 
 Board::Board() {}
@@ -20,17 +19,16 @@ void Board::Initialize() {
 }
 
 /*
-¿é¤J®æ¦¡: «e 25 ­Ó¿é¤J´Ñ¤lID
-[«á 10 ­Ó¿é¤J¤â±Æ­Ó¼Æ 0~2 (¥i¿ï)]
+è¼¸å…¥æ ¼å¼: å‰ 25 å€‹è¼¸å…¥æ£‹å­ID
+[å¾Œ 10 å€‹è¼¸å…¥æ‰‹ç‰Œå€‹æ•¸ 0~2 (å¯é¸)]
 */
 void Board::Initialize(const char *s) {
     memset(occupied, BLANK, 2 * sizeof(int));
     memset(bitboard, BLANK, 32 * sizeof(int));
     memset(board, BLANK, TOTAL_BOARD_SIZE * sizeof(int));
     record.clear();
-    turn = WHITE_TURN; // ¥ı¤â¬O¥Õ
-    //checking = false;
-    //nonBlockable = false;
+    m_turn = WHITE_TURN; // å…ˆæ‰‹æ˜¯ç™½
+    m_evaluate = 0;
 
     stringstream input(s);
     int i = 0, chess;
@@ -39,58 +37,35 @@ void Board::Initialize(const char *s) {
             board[i] = chess;
             bitboard[chess] |= 1 << i;
             occupied[chess > BLACKCHESS] |= 1 << i;
+            m_evaluate += CHESS_SCORE[chess];
         }
     }
 
     if (input.eof()) return;
     for (; i < TOTAL_BOARD_SIZE && input >> chess; ++i)
-        if (chess == 1 || chess == 2)
+        if (chess == 1 || chess == 2) {
             board[i] = chess;
+            m_evaluate += HAND_SCORE[i - 25] * chess;
+        }
 }
 
-bool Board::SaveBoard(const char* filename) {
-    fstream file(filename, ios::out | ios::app);
-
-    if (file) {
-        for (int i = 0; i < 35; ++i)
-            file << board[i] << " ";
-        
-        file << ".\n";
-        file.close();
-        return true;
-    }
-    return false;
-}
-
-bool Board::LoadBoard(const char* filename) {
-    fstream file(filename, ios::in);
-
-    if (file) {
-        char state[128];
-        file.getline(state, 128, '.');
-        file.close();
-        Initialize(state);
-        return true;
-    }
-    return false;
-}
-
-static const char *rank_name[] = { " A", " B", " C", " D", " E", " F", "  ", " G", "  " };
-void Board::PrintChessBoard() {
+void Board::PrintChessBoard() const {
+	static const char *RANK_NAME[] = { " A", " B", " C", " D", " E", " F", "  ", " G", "  " };
     int chess;
     int rank_count = 0;
     int board_count = 0;
 
     SetColor();
-    puts("\n  ¡U 5¡U 4¡U 3¡U 2¡U 1¡U");
+    puts("  ï½œ 5ï½œ 4ï½œ 3ï½œ 2ï½œ 1ï½œ");
     for (int i = 0; i < 9; i++) {
         puts(LINE_STRING);
-        if (i == 5) puts("  ¡U 5¡U 4¡U 3¡U 2¡U 1¡U\n");
+        if (i == 5) puts("  ï½œ 5ï½œ 4ï½œ 3ï½œ 2ï½œ 1ï½œ\n");
 
-        printf("%s", rank_name[rank_count]);
+        printf("%s", RANK_NAME[rank_count]);
         for (int j = 0; j < 5; j++, board_count++) {
-            printf("¡U");
-            if (board_count < BOARD_SIZE) chess = board[board_count];
+            printf("ï½œ");
+            if (board_count < BOARD_SIZE) 
+				chess = board[board_count];
             else if ((i == 5 && board[board_count % 5 + 25]) ||
                 (i == 6 && board[board_count % 5 + 25] == 2))
                 chess = BLACKCHESS | board_count % 5 + 1;
@@ -98,7 +73,7 @@ void Board::PrintChessBoard() {
                 (i == 8 && board[board_count % 5 + 30] == 2))
                 chess = (board_count % 5 + 1);
             else chess = 0;
-            // 10 = ¥Õ ; 11 = ¥Õ¤ÉÅÜ ; 12 = ¶Â ; 13 = ¶Â¤ÉÅÜ
+            // 10 = ç™½ ; 11 = ç™½å‡è®Š ; 12 = é»‘ ; 13 = é»‘å‡è®Š
             if (chess & BLACKCHESS) {
                 if (chess & PROMOTE) SetColor(13);
                 else SetColor(12);
@@ -111,20 +86,48 @@ void Board::PrintChessBoard() {
             printf("%s", CHESS_WORD[chess]);
             SetColor();
         }
-        printf("¡U%s\n", rank_name[rank_count++]);
+        printf("ï½œ%s\n", RANK_NAME[rank_count++]);
     }
-    puts("");
 }
 
+void Board::PrintNoncolorBoard(ostream &os) const {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		if (board[i] == BLANK)
+			os << " ï¼ ";
+		else {
+			os << SAVE_CHESS_WORD[board[i]];
+		}
+		if (i % 5 == 4)
+			os << "\n";
+	}
+	os << "â–¼";
+	for (int i = 0; i < 5; i++)
+		os << board[i + 25] << CHESS_WORD[i + 1];
+	os << "\nâ–³";
+	for (int i = 0; i < 5; i++) {
+		os << board[i + 30] << CHESS_WORD[i + 1];
+	}
+	os << "\n";
+}
+
+typedef void(*genmove)(Board &, Action *, U32 &);
+static const genmove move_func[] = { AttackGenerator, MoveGenerator, HandGenerator };
 bool Board::IsGameOver() {
-    if (bitboard[KING] == 0) {
-        //cout << "*****[¶Â¤èÀò³Ó]*****" << endl;
+    Action moveList[MAX_MOVE_NUM];
+    U32 cnt = 0, i = 0;
+    for (int _ = 0; _ < 3; _++) {
+        move_func[_](*this, moveList, cnt);
+        for (; i < cnt &&
+            IsCheckingAfter(ACTION_TO_SRCINDEX(moveList[i]), ACTION_TO_DSTINDEX(moveList[i]));
+            i++);
+        if (i != cnt) break;
+    }
+    if (i == cnt) {
+        PrintChessBoard();
+        cout << "Game Over! " << (m_turn ? "â–³" : "â–¼") << " Win!\n";
         return true;
     }
-    if (bitboard[KING | BLACKCHESS] == 0) {
-        //cout << "*****[¥Õ¤èÀò³Ó]*****" << endl;
-        return true;
-    }
+
     return false;
 }
 
@@ -137,66 +140,46 @@ void Board::DoMove(const Action action) {
         pro = ACTION_TO_ISPRO(action),
         dstboard = 1 << dstIndex;
 
-    if (srcIndex < BOARD_SIZE) { // ²¾°Ê
+    if (srcIndex < BOARD_SIZE) { // ç§»å‹•
         srcChess = board[srcIndex];
-        if (dstChess = board[dstIndex]) { // ¦Y
-            occupied[turn ^ 1] ^= dstboard; // §ó·s¹ï¤è³õ¤Wª¬ªp
-            bitboard[dstChess] ^= dstboard; // §ó·s¹ï¤è¤â±Æ
-            board[EatToHand[dstChess]]++; // Âà¬°¸Ó¤è¤â±Æ
+        if (dstChess = board[dstIndex]) { // åƒ
+            occupied[m_turn ^ 1] ^= dstboard; // æ›´æ–°å°æ–¹å ´ä¸Šç‹€æ³
+            bitboard[dstChess] ^= dstboard; // æ›´æ–°å°æ–¹æ‰‹ç‰Œ
+            board[EatToHand[dstChess]]++; // è½‰ç‚ºè©²æ–¹æ‰‹ç‰Œ
+            m_evaluate += HAND_SCORE[EatToHand[dstChess] - 25] - CHESS_SCORE[dstChess];
         }
 
-        occupied[turn] ^= (1 << srcIndex) | dstboard; // §ó·s¸Ó¤è³õ¤Wª¬ªp
-        bitboard[srcChess] ^= 1 << srcIndex; // ²¾°£¸Ó¤è¤â±Æ­ì¦³¦ì¸m
+        occupied[m_turn] ^= (1 << srcIndex) | dstboard; // æ›´æ–°è©²æ–¹å ´ä¸Šç‹€æ³
+        bitboard[srcChess] ^= 1 << srcIndex; // ç§»é™¤è©²æ–¹æ‰‹ç‰ŒåŸæœ‰ä½ç½®
 
-        if (pro) srcChess ^= PROMOTE; // ¤ÉÅÜ
-        bitboard[srcChess] ^= dstboard; // §ó·s¸Ó¤è¤â±Æ¦Ü¥Øªº¦ì¸m
-        board[srcIndex] = BLANK; // ­ì¥»²MªÅ
+        if (pro) {
+            srcChess ^= PROMOTE; // å‡è®Š
+            m_evaluate += CHESS_SCORE[srcChess] - CHESS_SCORE[srcChess ^ PROMOTE];
+        }
+        bitboard[srcChess] ^= dstboard; // æ›´æ–°è©²æ–¹æ‰‹ç‰Œè‡³ç›®çš„ä½ç½®
+        board[srcIndex] = BLANK; // åŸæœ¬æ¸…ç©º
     }
-    else { // ¥´¤J
+    else { // æ‰“å…¥
         srcChess = HandToChess[srcIndex];
-        occupied[turn] ^= dstboard; // ¥´¤J³õ¤Wªº¦ì¸m
-        bitboard[srcChess] ^= dstboard; // ¥´¤J¸Ó¤â±Æªº¦ì¸m
-        board[srcIndex]--; // ´î¤Ö¸Ó¤âµP
+        occupied[m_turn] ^= dstboard; // æ‰“å…¥å ´ä¸Šçš„ä½ç½®
+        bitboard[srcChess] ^= dstboard; // æ‰“å…¥è©²æ‰‹ç‰Œçš„ä½ç½®
+        board[srcIndex]--; // æ¸›å°‘è©²æ‰‹ç‰Œ
+        m_evaluate += CHESS_SCORE[srcChess] - HAND_SCORE[srcIndex - 25];
     }
-    board[dstIndex] = srcChess; // ©ñ¸m¨ì¥Øªº
+    board[dstIndex] = srcChess; // æ”¾ç½®åˆ°ç›®çš„
     record.push_back((dstChess << 18) | (srcChess << 12) | action);
 
-    turn ^= 1;
-
-    /*checking = 0;
-    nonBlockable = 0;
-    U32 attackboard;
-    U32 kingboard = bitboard[KING | turn << 4],
-        kingpos = BitScan(kingboard);
-    if (srcIndex < BOARD_SIZE) {
-        attackboard = (RookMove(*this, srcIndex) | BishopMove(*this, srcIndex)) & occupied[turn ^ 1];
-        while (attackboard) {
-            srcIndex = BitScan(attackboard);
-            if (Movable(*this, srcIndex) & kingboard) {
-                checking = 1;
-                if (Movement[KING][srcIndex] & kingboard) {
-                    nonBlockable = 2;
-                    break;
-                }
-            }
-            attackboard ^= 1 << srcIndex;
-        }
-    }
-    else if (Movable(*this, dstIndex) & kingboard) {
-        checking = 1;
-        if (Movement[KING][dstIndex] & kingboard)
-            nonBlockable = 2;
-    }*/
+	m_turn ^= 1;
 }
 
 void Board::UndoMove() {
-    if (record.size() == 0) { // ²Ä¹s­Ó¤¸¯À«O¯d¥Î¨Ó§PÂ_¥ı«á¤â
+    if (record.size() == 0) { // ç¬¬é›¶å€‹å…ƒç´ ä¿ç•™ç”¨ä¾†åˆ¤æ–·å…ˆå¾Œæ‰‹
         cout << "Can not undo any more!" << endl;
         return;
     }
     Action redo = record.back();
     record.pop_back();
-    turn ^= 1;
+	m_turn ^= 1;
 
     // 0 board[dst] board[src] dst src
     U32 srcIndex = ACTION_TO_SRCINDEX(redo),
@@ -206,405 +189,194 @@ void Board::UndoMove() {
         pro = ACTION_TO_ISPRO(redo),
         dstboard = 1 << dstIndex;
 
-    if (srcIndex < BOARD_SIZE) { // ¤§«e¬O²¾°Ê
-        if (dstChess) { // ¤§«e¦³¦Y¤l
-            occupied[turn ^ 1] ^= dstboard; // ÁÙ­ì¹ï¤è³õ¤Wª¬ªp
-            bitboard[dstChess] ^= dstboard; // ÁÙ­ì¹ï¤è¤â±Æ
-            board[EatToHand[dstChess]]--; // ±q¸Ó¤è¤â±Æ²¾°£
+    if (srcIndex < BOARD_SIZE) { // ä¹‹å‰æ˜¯ç§»å‹•
+        if (dstChess) { // ä¹‹å‰æœ‰åƒå­
+            occupied[m_turn ^ 1] ^= dstboard; // é‚„åŸå°æ–¹å ´ä¸Šç‹€æ³
+            bitboard[dstChess] ^= dstboard; // é‚„åŸå°æ–¹æ‰‹ç‰Œ
+            board[EatToHand[dstChess]]--; // å¾è©²æ–¹æ‰‹ç‰Œç§»é™¤
+
+            m_evaluate += CHESS_SCORE[dstChess] - HAND_SCORE[EatToHand[dstChess] - 25];
         }
 
-        occupied[turn] ^= (1 << srcIndex) | dstboard; // ÁÙ­ì¸Ó¤è³õ¤Wª¬ªp
-        bitboard[srcChess] ^= dstboard; // ²¾°£¸Ó¤è¤â±Æªº¥Øªº¦ì¸m
+        occupied[m_turn] ^= (1 << srcIndex) | dstboard; // é‚„åŸè©²æ–¹å ´ä¸Šç‹€æ³
+        bitboard[srcChess] ^= dstboard; // ç§»é™¤è©²æ–¹æ‰‹ç‰Œçš„ç›®çš„ä½ç½®
 
-        if (pro) srcChess ^= PROMOTE; // ¤§«e¦³¤ÉÅÜ
-        bitboard[srcChess] ^= 1 << srcIndex; // ÁÙ­ì¸Ó¤è¤â±Æ­ì¦³¦ì¸m
-        board[srcIndex] = srcChess; // ÁÙ­ì
-    }
-    else { // ¤§«e¬O¥´¤J
-        occupied[turn] ^= dstboard; // ¨ú®ø¥´¤J³õ¤Wªº¦ì¸m
-        bitboard[srcChess] ^= dstboard; // ¨ú®ø¥´¤J¸Ó¤â±Æªº¦ì¸m
-        board[srcIndex]++; // ¦¬¦^¸Ó¤âµP
-    }
-    board[dstIndex] = dstChess; // ÁÙ­ì¥Øªº´Ñ
-    /*checking = false;
-    nonBlockable = false;*/
-}
-
-int ConvertInput(int row, int col, int turn) {
-    if ('A' <= row && row <= 'G' && '1' <= col && col <= '5') {
-        if (row == 'F')
-            return 25 + turn * 5 + '5' - col;
-        else if (row == 'G')
-            return 30 + turn * 5 + '5' - col;
-        else
-            return (row - 'A') * 5 + '5' - col;
-    }
-    return -1;
-}
-
-Action Human_DoMove(Board &board) {
-    string cmd;
-    cin.clear();
-    cout << "½Ğ¿é¤J²¾°Ê«ü¥O (¨Ò E5D5+) : " << endl;
-    cin >> cmd;
-    cin.ignore();
-    if (cmd.length() != 4 && cmd.length() != 5) {
-        cout << "Invalid Move : Wrong input length" << endl;
-        return 0;
-    }
-
-    int srcIndex = ConvertInput(toupper(cmd[0]), cmd[1], board.GetTurn());
-    int dstIndex = ConvertInput(toupper(cmd[2]), cmd[3], board.GetTurn());
-    if (srcIndex == -1 || dstIndex == -1 || (cmd.length() == 5 && cmd[4] != '+')) {
-        cout << "Invalid Move : Bad Input" << endl;
-        return 0;
-
-    }
-    bool isPro = cmd.length() == 5;
-    int srcChess;
-
-    //src¦ì¸mªº´Ñ¬O¤°»ò
-    if (srcIndex < BOARD_SIZE)
-        srcChess = board.board[srcIndex];
-    else {
-        if (!board.board[srcIndex]) {
-            cout << "Invalid Move: No chess to handmove" << endl;
-            return 0;
+        if (pro) {
+            srcChess ^= PROMOTE; // ä¹‹å‰æœ‰å‡è®Š
+            m_evaluate += CHESS_SCORE[srcChess] - CHESS_SCORE[srcChess ^ PROMOTE];
         }
-        srcChess = (srcIndex < 30 ? BLACKCHESS : 0) | (srcIndex % 5 + 1);
+        bitboard[srcChess] ^= 1 << srcIndex; // é‚„åŸè©²æ–¹æ‰‹ç‰ŒåŸæœ‰ä½ç½®
+        board[srcIndex] = srcChess; // é‚„åŸ
     }
-
-    if (srcChess >> 4 != board.GetTurn()) {
-        cout << "Invalid Move : " << CHESS_WORD[srcChess] << " is not your chess" << endl;
-        return 0;
+    else { // ä¹‹å‰æ˜¯æ‰“å…¥
+        occupied[m_turn] ^= dstboard; // å–æ¶ˆæ‰“å…¥å ´ä¸Šçš„ä½ç½®
+        bitboard[srcChess] ^= dstboard; // å–æ¶ˆæ‰“å…¥è©²æ‰‹ç‰Œçš„ä½ç½®
+        board[srcIndex]++; // æ”¶å›è©²æ‰‹ç‰Œ
+        m_evaluate += HAND_SCORE[srcIndex - 25] - CHESS_SCORE[srcChess];
     }
-
-    if (srcIndex >= BOARD_SIZE) { // ¥´¤J
-        if (isPro) {
-            cout << "Invalid Move : Promotion prohobited on handmove" << endl;
-            return 0;
-        }
-
-        if (board.board[dstIndex]) {
-            cout << "Invalid Move : " << CHESS_WORD[srcChess] << " ¸Ó¦ì¸m¦³´Ñ¤l" << endl;
-            return 0;
-        }
-
-        if ((srcChess & 15) == PAWN) {
-            if (!Movement[srcChess][dstIndex]) {
-                cout << "Invalid Move : " << CHESS_WORD[srcChess] << " ¥´¤J¸Ó¦ì¸m¤£¯à²¾°Ê" << endl;
-                return 0;
-            }
-
-            if (column_mask(dstIndex) & board.bitboard[srcChess]) {
-                cout << "Invalid Move : " << CHESS_WORD[srcChess] << " ¤G¨B" << endl;
-                return 0;
-            }
-
-            /* TODO: ¨B§L¤£¥i¥ß§Y±N¦º>¥´¨B¸×(¥¼°µ) */
-        }
-    }
-    else {
-        //³B²z¤ÉÅÜ + ¥´¤J³W«h¤@¡G¤£¯à°¨¤W¤ÉÅÜ
-        if (isPro) {
-            if ((srcChess == PAWN || srcChess == SILVER || srcChess == BISHOP || srcChess == ROOK ||
-                srcChess == (PAWN | BLACKCHESS) || srcChess == (SILVER | BLACKCHESS) || srcChess == (BISHOP | BLACKCHESS) || srcChess == (ROOK | BLACKCHESS))) {
-                //¬O§_¦b¼Ä°Ï¤º
-                if (!((1 << dstIndex) & (srcChess < BLACKCHESS ? BLACK_CAMP : WHITE_CAMP)) &&
-                    !((1 << srcIndex) & (srcChess < BLACKCHESS ? BLACK_CAMP : WHITE_CAMP))) {
-                    cout << "§A¤£¦b¼Ä°Ï¡A¤£¯à¤ÉÅÜ" << endl;
-                    return 0;
-                }
-            }
-            else {
-                cout << "§A¤S¤£¯à¤ÉÅÜ" << endl;
-                return 0;
-            }
-        }
-
-        //±N¸Ó¦ì¸m¥i¨«ªº¨Bªk¸ò¥Øªº¨Bªk & ¤ñ¹ï¡A²£¥Í¸Ó´Ñªºboardµ²ªG¡A¤£¦Xªk´N·|¬O0
-        if (!(Movable(board, srcIndex) & (1 << dstIndex))) {
-            cout << "Invalid Move :invalid " << CHESS_WORD[srcChess] << " move." << endl;
-            return 0;
-        }
-    }
-
-    return (isPro << 24) | (dstIndex << 6) | srcIndex;
+    board[dstIndex] = dstChess; // é‚„åŸç›®çš„æ£‹
 }
 
-Action AI_DoMove(Board &board) {
-    cout << "AI «ä¦Ò¤¤..." << endl;
-    return IDAS(board, board.GetTurn());
+//int Board::Evaluate() {
+//	int i = 0, score = 0;
+//	for (; i < 25; i++) {
+//		if (board[i])
+//			score += CHESS_SCORE[board[i]];
+//	}
+//	for (; i < 35; i++) {
+//		if (board[i])
+//			score += HAND_SCORE[i - 25] * board[i];
+//	}
+//	return m_turn ? score : -score;
+//}
+
+bool Board::SaveBoard(const string filename, const string comment) const {
+	string filepath = BOARD_PATH + filename;
+	fstream file(filepath, ios::out | ios::app);
+	if (!file) {
+		CreateDirectory(LBOARD_PATH, NULL);
+		file.open(filepath, ios::out | ios::app);
+	}
+	if (file) {
+		file << "+" << comment << endl;
+		PrintNoncolorBoard(file);
+		file.close();
+		cout << "Success Save Board to " << filepath << endl;
+		return true;
+	}
+	cout << "Fail Save Board to " << filepath << endl;
+	return false;
 }
 
-int Board::Evaluate() {
-    int i = 0, score = 0;
-    for (; i < 25; i++) {
-		if (board[i])
-			score += CHESS_SCORE[board[i]];
-    }
-    for (; i < 35; i++) {
-		if (board[i])
-			score += HAND_SCORE[i - 25] * board[i];
-    }
-    return turn ? score : -score;
-}
+bool Board::LoadBoard(const string filename, int &offset) {
+	string filepath = BOARD_PATH + filename;
+	fstream file(filepath, ios::in);
+	if (file) {
+		stringstream ss;
+		char str[128];
+		file.seekg(offset, ios::beg);
+		file.getline(str, 128);
+		if (file.eof() || str[0] == '\0') {
+			cout << "Fail Load Board from " << filepath << " It's eof.\n";
+			return false;
+		}
+		if (str[0] != '+') {
+			cout << "Fail Load Board from " << filepath << " It's error symbol.\n";
+			return false;
+		}
 
-U32 RookMove(const Board &board, const int pos) {
-    // upper (find LSB) ; lower (find MSB)
-    U32 occupied = board.occupied[WHITE_TURN] | board.occupied[BLACK_TURN];
-    U32 rank, file;
-    U32 upper, lower;
-
-    // row
-    upper = (occupied & row_upper[pos]) | HIGHTEST_BOARD_POS;
-    lower = (occupied & row_lower[pos]) | LOWEST_BOARD_POS;
-
-    upper = (upper & (~upper + 1)) << 1;
-    lower = 1 << BitScanRev(lower);
-
-    rank = (upper - lower) & row_mask(pos);
-
-    // column
-    upper = (occupied & column_upper[pos]) | HIGHTEST_BOARD_POS;
-    lower = (occupied & column_lower[pos]) | LOWEST_BOARD_POS;
-
-    upper = (upper & (~upper + 1)) << 1;
-    lower = 1 << BitScanRev(lower);
-
-    file = (upper - lower) & column_mask(pos);
-
-    return rank | file;
-}
-
-U32 BishopMove(const Board &board, const int pos) {
-    // upper (find LSB) ; lower (find MSB)
-    U32 occupied = board.occupied[WHITE_TURN] | board.occupied[BLACK_TURN];
-    U32 slope1, slope2;
-    U32 upper, lower;
-
-    // slope1 "/"
-    upper = (occupied & slope1_upper[pos]) | HIGHTEST_BOARD_POS;
-    lower = (occupied & slope1_lower[pos]) | LOWEST_BOARD_POS;
-
-    upper = (upper & (~upper + 1)) << 1;
-    lower = 1 << BitScanRev(lower);
-
-    slope1 = (upper - lower) & slope1_mask(pos);
-
-    // slope2 "\"
-    upper = (occupied & slope2_upper[pos]) | HIGHTEST_BOARD_POS;
-    lower = (occupied & slope2_lower[pos]) | LOWEST_BOARD_POS;
-
-    upper = (upper & (~upper + 1)) << 1;
-    lower = 1 << BitScanRev(lower);
-
-    slope2 = (upper - lower) & slope2_mask(pos);
-
-    return slope1 | slope2;
-}
-
-inline U32 Movable(const Board &board, const int srcIndex) {
-    const int srcChess = board.board[srcIndex];
-
-    if ((srcChess & 7) == BISHOP) {
-        if (srcChess & PROMOTE)
-            return BishopMove(board, srcIndex) | Movement[KING][srcIndex];
-        return BishopMove(board, srcIndex);
-    }
-    else if ((srcChess & 7) == ROOK) {
-        if (srcChess & PROMOTE)
-            return RookMove(board, srcIndex) | Movement[KING][srcIndex];
-        return RookMove(board, srcIndex);
-    }
-    else if (srcChess & PROMOTE) {
-        return Movement[GOLD | (srcChess & BLACKCHESS)][srcIndex];
-    }
-    return Movement[srcChess][srcIndex];
-}
-
-bool IsStillChecking(Board &board, const int src, const int dst) {
-    bool isStillChecking = false;
-    U32 turn = board.GetTurn(), dstboard = 1 << dst, moveboard = (1 << src) | dstboard;
-
-    /************ DoMove ************/
-    if (src < BOARD_SIZE) {
-        if (board.board[dst]) // ¦Y
-            board.occupied[turn ^ 1] ^= dstboard;
-
-        board.occupied[turn] ^= moveboard;
-        board.bitboard[board.board[src]] ^= moveboard;
-    }
-    else {
-        board.occupied[turn] ^= dstboard;
-    }
-    /************ DoMove ************/
-
-    /* get the position of the checked king */
-    U32 kingboard = board.bitboard[KING | (turn ? BLACKCHESS : 0)],
-        kingpos = BitScan(kingboard);
-
-    /* get the possible position which might attack king */
-    U32 attackboard = (RookMove(board, kingpos) | BishopMove(board, kingpos)) & board.occupied[turn ^ 1];
-
-    /* search the possible position */
-    while (attackboard) {
-        U32 attsrc = BitScan(attackboard);
-        isStillChecking = Movable(board, attsrc) & kingboard;
-        if (isStillChecking) break;
-        attackboard ^= 1 << attsrc;
-    }
-
-    /************ UnDoMove ************/
-    if (src < BOARD_SIZE) {
-        if (board.board[dst]) // ¦Y
-            board.occupied[turn ^ 1] ^= dstboard;
-
-        board.occupied[turn] ^= moveboard;
-        board.bitboard[board.board[src]] ^= moveboard;
-    }
-    else {
-        board.occupied[turn] ^= dstboard;
-    }
-    /************ UnDoMove ************/
-    if (isStillChecking) ++nnnn;
-    return isStillChecking;
-}
-
-void AttackGenerator(Board &board, Action *movelist, U32 &start) {
-    U32 turn = board.GetTurn();
-	U32 srcboard, dstboard, opboard = board.occupied[turn ^ 1], src, dst, pro;
-    U32 kingpos = 0, WB = turn << 4;
-    //if (board.IsnonBlockable())
-    //    kingpos = board.bitboard[KING | WB];
-
-	for (int i = 0; i < 10; i++) {
-		srcboard = board.bitboard[AttackOrdering[i] | WB];
-		while (srcboard) {
-			src = BitScan(srcboard);
-            srcboard ^= 1 << src;
-			dstboard = Movable(board, src) & opboard;
-			while (dstboard) {
-                dst = turn ? BitScanRev(dstboard) : BitScan(dstboard);
-				dstboard ^= 1 << dst;
-
-                /*if (kingpos && !(Movement[KING][dst] & kingpos)) continue;
-                if (board.IsChecking() && */
-                if (IsStillChecking(board, src, dst)) continue;
-                pro = (A_Promotable[i] && ((1 << src | 1 << dst) & ENEMYCAMP(turn))) ? PRO_MASK : 0;
-                movelist[start++] = pro | (dst << 6) | src;
+		for (int i = 0; i < 5; i++) {
+			char chessStr[5] = "    ";
+			file.getline(str, 128);
+			for (int j = 0; j < 5; j++) {
+				strncpy(chessStr, str + 4 * j, 4);
+				for (int i = 0; i < 30; i++) {
+					if (strcmp(SAVE_CHESS_WORD[i], chessStr) == 0) {
+						ss << i << " ";
+						break;
+					}
+				}
 			}
 		}
+		file.getline(str, 128);
+		for (int i = 0; i < 5; i++) ss << str[2 + 3 * i] - '0' << " ";
+		file.getline(str, 128);
+		for (int i = 0; i < 5; i++) ss << str[2 + 3 * i] - '0' << " ";
+		
+		offset = file.tellg();
+		file.close();
+
+		Initialize(ss.str().c_str());
+		cout << "Success Load Board from " << filepath << endl;
+		return true;
 	}
+	cout << "Fail Load Board from " << filepath << endl;
+	return 0;
 }
 
-void MoveGenerator(Board &board, Action *movelist, U32 &start) {
-    U32 turn = board.GetTurn();
-	U32 srcboard, dstboard, blankboard = blank_board, src, dst, pro;
-    U32 kingpos = 0, WB = turn << 4;
-    //if (board.IsnonBlockable())
-    //    kingpos = board.bitboard[KING | WB];
-
-	for (int i = 0; i < 10; i++) {
-		srcboard = board.bitboard[MoveOrdering[i] | WB];
-		while (srcboard) {
-			src = BitScan(srcboard);
-			srcboard ^= 1 << src;
-			dstboard = Movable(board, src) & blankboard;
-			while (dstboard) {
-                dst = turn ? BitScanRev(dstboard) : BitScan(dstboard);
-				dstboard ^= 1 << dst;
-
-                /*if (kingpos && !(Movement[KING][dst] & kingpos)) continue;
-                if (board.IsChecking() && */
-                if (IsStillChecking(board, src, dst)) continue;
-				pro = (M_Promotable[i] && ((1 << src | 1 << dst) & ENEMYCAMP(turn))) ? PRO_MASK : 0;
-				movelist[start++] = pro | (dst << 6) | src;
-			}
+bool Board::SaveKifu(string filename, const string comment) const {
+	string filepath = KIFU_PATH + filename;
+	fstream file(filepath, ios::out);
+	if (!file) {
+		CreateDirectory(LKIFU_PATH, NULL);
+		file.open(filepath, ios::out);
+	}
+	if (file) {
+		file << "*" << comment << endl;
+		for (int i = 0; i < record.size(); i++) {
+			file << i << " : " << (i % 2 ? "â–¼" : "â–³");
+			file << Index2Input(ACTION_TO_SRCINDEX(record[i]));
+			file << Index2Input(ACTION_TO_DSTINDEX(record[i]));
+			file << (ACTION_TO_ISPRO(record[i]) ? "+\n" : "\n");
 		}
+		file.close();
+		cout << "Success Save Kifu to " << filepath << endl;
+		return true;
 	}
+	cout << "Fail Save Kifu to " << filepath << endl;
+	return false;
 }
 
-void HandGenerator(Board &board, Action *movelist, U32 &start) {
-    /* TODO: §Q¥Î¬d§ä¤W¤@¨B§Ö³t§PÂ_¦³¨S¦³¤ı¤â¡A¥¼§¹¦¨ */
-    //if (board.IsnonBlockable()) return;
+// TODO : ç›®å‰åƒ…èƒ½è™•ç†å°è¿´åœˆ ç­‰æ¶æ§‹ç©©å®šå†ä¾†è€ƒæ…®å®Œæ•´æ–¹æ¡ˆ åŒæ™‚é¿å…é€Ÿåº¦è®Šæ…¢
+bool Board::IsSennichite(Action action) const {
+	if (record.size() < 5) return false;
+	if (ACTION_TO_SRCINDEX(record[record.size() - 1]) ==
+		ACTION_TO_DSTINDEX(record[record.size() - 3]) &&
+		ACTION_TO_DSTINDEX(record[record.size() - 1]) ==
+		ACTION_TO_SRCINDEX(record[record.size() - 3]) &&
+		ACTION_TO_SRCINDEX(record[record.size() - 2]) == ACTION_TO_DSTINDEX(action) &&
+		ACTION_TO_DSTINDEX(record[record.size() - 2]) == ACTION_TO_SRCINDEX(action)) {
+		return true;
+	}
+	return false;
+}
 
-    U32 turn = board.GetTurn();
-    U32 srcboard = 0, dstboard = blank_board, src = (turn ? 30 : 35), dst, nifu = 0;
-    U32 handcnt;
-    for (int i = 1; i <= 5; ++i)
-        if (!board.board[src - i])
-            ++handcnt;
-    if (handcnt == 5) return;
+bool Board::IsCheckingAfter(const int src, const int dst) {
+	bool isStillChecking = false;
+	U32 dstboard = 1 << dst, moveboard = (1 << src) | dstboard;
 
-    while (dstboard) {
-        dst = BitScan(dstboard);
-        dstboard ^= 1 << dst;
-        if (IsStillChecking(board, src, dst)) continue;
-        srcboard |= 1 << dst;
-    }
-    /*if (board.IsChecking()) {
+	/************ DoMove ************/
+	if (src < BOARD_SIZE) {
+		if (board[dst]) // åƒ
+			occupied[m_turn ^ 1] ^= dstboard;
 
-        U32 kingpos = BitScan(board.bitboard[KING | (turn << 4)]);
-        U32 attackboard = BishopMove(board, kingpos),
-            opboard = (board.bitboard[BISHOP | (turn ? 0 : BLACKCHESS)] |
-            board.bitboard[BISHOP | PROMOTE | (turn ? 0 : BLACKCHESS)]) & attackboard;
-        if (opboard) {
-            srcboard = attackboard ^ opboard;
-            if (slope1_lower[kingpos] & opboard)
-                srcboard &= slope1_lower[kingpos];
-            else if (slope1_upper[kingpos] & opboard)
-                srcboard &= slope1_upper[kingpos];
-            else if (slope2_lower[kingpos] & opboard)
-                srcboard &= slope2_lower[kingpos];
-            else
-                srcboard &= slope2_upper[kingpos];
-        }
-        else {
-            attackboard = RookMove(board, kingpos);
-            opboard = (board.bitboard[ROOK | (turn ? 0 : BLACKCHESS)] |
-            board.bitboard[ROOK | PROMOTE | (turn ? 0 : BLACKCHESS)]) & attackboard;
-            srcboard = attackboard ^ opboard;
-            if (column_lower[kingpos] & opboard)
-                srcboard &= column_lower[kingpos];
-            else if (column_upper[kingpos] & opboard)
-                srcboard &= column_upper[kingpos];
-            else if (row_lower[kingpos] & opboard)
-                srcboard &= row_lower[kingpos];
-            else
-                srcboard &= row_upper[kingpos];
-        }
-    }
-    else srcboard = blank_board*/
+		occupied[m_turn] ^= moveboard;
+		bitboard[board[src]] ^= moveboard;
+	}
+	else {
+		occupied[m_turn] ^= dstboard;
+	}
+	/************ DoMove ************/
 
-    for (int i = 1; i < 5; i++) { // ¨B¥H¥~ªº¤â±Æ
-        if (board.board[--src]) {
-            dstboard = srcboard;
-            while (dstboard) {
-                dst = BitScan(dstboard);
-                dstboard ^= 1 << dst;
-                movelist[start++] = (dst << 6) | src;
-            }
-        }
-    }
+	/* get the position of the checked king */
+	U32 kingboard = bitboard[KING | (m_turn ? BLACKCHESS : 0)],
+		kingpos = BitScan(kingboard);
 
-    if (board.board[--src]) { // ¨B
-        dstboard = board.bitboard[(turn << 4) | PAWN]; // §Ú¤èªº¨B
-        while (dstboard) {
-            dst = BitScan(dstboard);
-            dstboard ^= 1 << dst;
-            nifu |= column_mask(dst); // ¤G¨B
-        }
+	/* get the possible position which might attack king */
+	U32 attackboard = (RookMove(*this, kingpos) | BishopMove(*this, kingpos)) & occupied[m_turn ^ 1];
 
-        /* TODO: ¥´¨B¸×  (¼È®É³W©w¤ıªº«e¤è¤£¯à¥´¤J) */
-        if (turn == BLACK_TURN) nifu |= board.bitboard[KING] >> 5;
-        else nifu |= board.bitboard[KING | BLACKCHESS] << 5;
+	/* search the possible position */
+	while (attackboard) {
+		U32 attsrc = BitScan(attackboard);
+		isStillChecking = Movable(*this, attsrc) & kingboard;
+		if (isStillChecking) break;
+		attackboard ^= 1 << attsrc;
+	}
 
-        dstboard = srcboard & ~(ENEMYCAMP(turn) | nifu);
-        while (dstboard) {
-            dst = BitScan(dstboard);
-            dstboard ^= 1 << dst;
-            movelist[start++] = (dst << 6) | src;
-        }
-    }
+	/************ UnDoMove ************/
+	if (src < BOARD_SIZE) {
+		if (board[dst]) // åƒ
+			occupied[m_turn ^ 1] ^= dstboard;
+
+		occupied[m_turn] ^= moveboard;
+		bitboard[board[src]] ^= moveboard;
+	}
+	else {
+		occupied[m_turn] ^= dstboard;
+	}
+	/************ UnDoMove ************/
+	if (isStillChecking) {
+		Observer::cutIllgalBranch++;
+	}
+	return isStillChecking;
 }

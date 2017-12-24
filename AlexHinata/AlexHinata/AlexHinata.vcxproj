@@ -88,9 +88,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -151,15 +151,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Minishogi\Minishogi\board.h" />
+    <ClInclude Include="..\..\..\Minishogi\Minishogi\MoveGene.h" />
+    <ClInclude Include="..\..\..\Minishogi\Minishogi\Observer.h" />
     <ClInclude Include="AI.h" />
+    <ClInclude Include="bitscan.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="head.h" />
     <ClInclude Include="library.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Minishogi\Minishogi\board.cpp" />
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="board.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MoveGene.cpp" />
+    <ClCompile Include="Observer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
