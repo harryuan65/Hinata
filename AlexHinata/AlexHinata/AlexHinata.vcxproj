@@ -161,7 +161,6 @@
     <ClInclude Include="library.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Minishogi\Minishogi\board.cpp" />
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="board.cpp" />
     <ClCompile Include="main.cpp" />

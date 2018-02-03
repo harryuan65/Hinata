@@ -38,7 +38,7 @@ int main() {
 
     for (;;) {
         cout << "請選擇對手:\n(0)玩家vs電腦\n(1)電腦vs玩家\n(2)玩家對打\n(3)電腦對打\n(4)電腦對打 本機vs其他程式\n"; //(5)電腦對打 其他程式vs本機\n
-		gameMode = _getche() - '0';
+		gameMode = getchar() - '0';
         switch (gameMode)
         {
         case 0:
@@ -64,19 +64,26 @@ int main() {
         }
         break;
     }
-    cout << "\n輸入AI思考層數: ";
-    cin >> Observer::IDAS_DEPTH;
-	cout << "從board//" << CUSTOM_BOARD_FILE << "讀取多個盤面 並連續對打? ";
-	isCustomBoard = _getche() != '0';
-	cout << "\n執行時匯出cmd畫面? ";
-	Observer::isAutoSaveDetail = _getche() != '0';
-	cout << "\n結束時匯出棋譜? ";
-	Observer::isAutoSaveKifu = _getche() != '0';
+	cin.ignore();
+	
+	cout << "輸入搜尋的深度\n";
+	cin >> Observer::depth;
+	cin.ignore();
+	cout << "從board//" << CUSTOM_BOARD_FILE << "讀取多個盤面 並連續對打?\n";
+	isCustomBoard = getchar() != '0';
+	cin.ignore();
+	cout << "結束時匯出cmd畫面?\n";
+	Observer::isAutoSaveDetail = getchar() != '0';
+	cin.ignore();
+	cout << "結束時匯出棋譜?\n";
+	Observer::isAutoSaveKifu = getchar() != '0';
+	cin.ignore();
 	if (gameMode != 2) {
-		cout << "\n結束時匯出AI平均效能? ";
-		Observer::isAutoSaveAIReport = _getche() != '0';
+		cout << "結束時匯出AI平均效能?\n";
+		Observer::isAutoSaveAIReport = getchar() != '0';
+		cin.ignore();
 	}
-	cout << "\n確定要開始?\n";
+	cout << "確定要開始? ";
 	system("pause");
 
     /*int choice;
@@ -96,19 +103,40 @@ int main() {
     else */
 
 	do {
-        Observer::IDAS_TEMP_DEPTH = Observer::IDAS_DEPTH;
+		m_Board.Initialize();
 		if (isCustomBoard) {
 			if (!m_Board.LoadBoard(CUSTOM_BOARD_FILE, readBoardOffset)) {
 				break;
 			}
 		}
-        else m_Board.Initialize();
-
+		Observer::GameStart(m_Board.GetZobristHash());
 		while (!m_Board.IsGameOver()) {
+			/*cout << (m_Board.GetTurn() ? "GREEN" : "RED") << " turn\n";
+			Action moveList[128] = { 0 };
+			U32 cnt = 0;
+			AttackGenerator(m_Board, moveList, cnt);
+			cout << "Atta cnt : " << cnt << "\n";
+			cnt = 0;
+			MoveGenerator(m_Board, moveList, cnt);
+			cout << "Move cnt : " << cnt << "\n";
+			cnt = 0;
+			HandGenerator(m_Board, moveList, cnt);
+			cout << "Hand cnt : " << cnt << "\n";*/
+			/*cout << "是否紀錄 ? : (否: 0 / 存: 1 / 讀 : 2)\n";
+			while (cin >> choice && choice != 0 && choice != 1 && choice != 2);
+			if (choice == 1) {
+				m_Board.SaveBoard("board.txt");
+				continue;
+			}
+			else if (choice == 2) {
+				m_Board.LoadBoard("board.txt");
+				continue;
+			}*/
+
 			PV pv;
-			cout << "---------------- Step " << m_Board.record.size() << " ----------------\n";
+			cout << "---------- Game " << Observer::gameNum << " Step " << m_Board.GetStep() << " ----------\n";
 			m_Board.PrintChessBoard();
-			cout << (m_Board.GetTurn() ? "[▼ Turn]\n\n" : "[△ Turn]\n\n");
+			cout << (m_Board.GetTurn() ? "[▼ Turn]\n" : "[△ Turn]\n") << "\n";
 			if (player[m_Board.GetTurn()] == HUMAN_CTRL) {
 				while (!(action = Human_DoMove(m_Board)));
 			}
@@ -120,8 +148,7 @@ int main() {
 
 				pv.Print(cout, m_Board.GetTurn());
 				Observer::PrintReport(cout);
-				//if (Observer::searchTime > 20)
-                //cout << "\a"; //很吵
+				//if (Observer::searchTime > 60) cout << "\a"; //很吵
 			}
 			else {
 				cin >> action;
@@ -139,25 +166,31 @@ int main() {
 				cout << "投降! I'm lose" << endl;
 				break;
 			}
+			if (m_Board.GetStep() == 100) { //TODO: 以後會刪掉
+				cout << "千日手! I'm lose" << endl;
+				break;
+			}
 			m_Board.DoMove(action);
 		}
+		Observer::GameOver(!m_Board.GetTurn(), m_Board.GetKifuHash());
 
-		//cout << "Game Over! " << (m_Board.GetTurn() ? "△" : "▼") << " Win!\n";
+		cout << "Game Over! " << (m_Board.GetTurn() ? "△" : "▼") << " Win!\n";
 		if (Observer::isAutoSaveKifu) {
 			if (isCustomBoard) {
-				m_Board.SaveKifu(currTimeStr + "_Kifu_" + to_string(Observer::gameNum) + ".txt", currTimeStr);
+				m_Board.SaveKifu(currTimeStr + "_Kifu_" + to_string(Observer::gameNum - 1) + ".txt", currTimeStr);
 			}
 			else {
 				m_Board.SaveKifu(currTimeStr + "_Kifu.txt", currTimeStr);
 			}
 		}
-		Observer::GameOver(m_Board.GetTurn());
+		if (Observer::isAutoSaveAIReport) {
+			SaveAIReport(currTimeStr + "_AiReport.txt", currTimeStr);
+		}
+		Observer::PrintGameReport(cout);
 	} while (isCustomBoard);
-	if (Observer::isAutoSaveAIReport)
-		SaveAIReport(currTimeStr + "_AiReport.txt", currTimeStr);
-	Observer::PrintAvgReport(cout);
+	Observer::PrintObserverReport(cout);
 
-	//cout << "\a\a\a"; //終わり　びびびー
+	cout << "\a\a\a"; //終わり　びびびー
     system("pause");
     return 0;
 }
@@ -255,7 +288,7 @@ Action Human_DoMove(Board &board) {
 
 Action AI_DoMove(Board &board, PV &pv) {
 	cout << "AI 思考中..." << endl;
-	return IDAS(board, board.GetTurn(), pv);
+	return IDAS(board, pv);
 }
 
 bool SavePlayDetail(const string filename, const string comment, Board &board, Action action, PV &pv) {
@@ -266,9 +299,9 @@ bool SavePlayDetail(const string filename, const string comment, Board &board, A
 		file.open(filepath, ios::out | ios::app);
 	}
 	if (file) {
-		if (board.record.size() == 0)
+		if (board.GetStep() == 0)
 			file << "#" << comment << "\n";
-		file << "---------------- Step " << board.record.size() << " ----------------\n";
+		file << "---------- Game " << Observer::gameNum << " Step " << board.GetStep() << " ----------\n";
 		board.PrintNoncolorBoard(file);
 		file << (board.GetTurn() ? "[▼ Turn]\n" : "[△ Turn]\n");
 		if (pv.count != 0) {
@@ -291,18 +324,21 @@ bool SaveAIReport(const string filename, const string comment) {
 	if (Observer::searchNum == 0)
 		return false;
 	string filepath = REPORT_PATH + filename;
-	fstream file(filepath, ios::out);
+	fstream file(filepath, ios::app);
 	if (!file) {
 		CreateDirectory(LREPORT_PATH, NULL);
 		file.open(filepath);
 	}
 	if (file) {
-		file << "#" << comment << endl;
-		Observer::PrintAvgReport(file);
+		if (Observer::gameNum <= 1)
+			file << "#" << comment << "\n";
+		else
+			file << "\n";
+		Observer::PrintGameReport(file);
 		file.close();
-		cout << "Success Save AI Report to " << filepath << endl;
+		cout << "Success Save AI Report to " << filepath << "\n";
 		return true;
 	}
-	cout << "Fail Save AI Report to " << filepath << endl;
+	cout << "Fail Save AI Report to " << filepath << "\n";
 	return false;
 }

@@ -5,7 +5,28 @@
 #define LINE_STRING "—┼—┼—┼—┼—┼—┼—"
 #endif
 
-Board::Board() {}
+U64 Board::ZOBRIST_TABLE[TOTAL_BOARD_SIZE][30];
+
+Board::Board() {
+    /* Make Zobrsit Table */
+    srand(ZOBRIST_SEED);
+    int i = 0, j, k, shift = 8;
+    for (; i < 25; ++i) {
+        for (j = 0; j < 30; ++j) {
+            for (k = 0; k < 64; k += shift) {
+                ZOBRIST_TABLE[i][j] = (ZOBRIST_TABLE[i][j] << shift) | rand();
+            }
+        }
+    }
+
+    for (; i < 37; ++i) {
+        for (j = 0; j < 3; ++j) {
+            for (k = 0; k < 64; k += shift) {
+                ZOBRIST_TABLE[i][j] = ZOBRIST_TABLE[i][j] << shift | rand();
+            }
+        }
+    }
+}
 
 Board::~Board() {}
 
@@ -20,15 +41,15 @@ void Board::Initialize() {
 
 /*
 輸入格式: 前 25 個輸入棋子ID
-[後 10 個輸入手牌個數 0~2 (可選)]
+[後 10 個輸入手排個數 0~2 (可選)]
 */
 void Board::Initialize(const char *s) {
     memset(occupied, BLANK, 2 * sizeof(int));
     memset(bitboard, BLANK, 32 * sizeof(int));
     memset(board, BLANK, TOTAL_BOARD_SIZE * sizeof(int));
-    record.clear();
     m_turn = WHITE_TURN; // 先手是白
     m_evaluate = 0;
+    m_step = 0;
 
     stringstream input(s);
     int i = 0, chess;
@@ -38,18 +59,23 @@ void Board::Initialize(const char *s) {
             bitboard[chess] |= 1 << i;
             occupied[chess > BLACKCHESS] |= 1 << i;
             m_evaluate += CHESS_SCORE[chess];
+            m_hashcode ^= ZOBRIST_TABLE[i][chess];
         }
     }
 
-    if (input.eof()) return;
-    for (; i < TOTAL_BOARD_SIZE && input >> chess; ++i)
-        if (chess == 1 || chess == 2) {
-            board[i] = chess;
-            m_evaluate += HAND_SCORE[i - 25] * chess;
-        }
+	if (!input.eof()) {
+		for (; i < TOTAL_BOARD_SIZE && input >> chess; ++i)
+            if (chess == 1 || chess == 2) {
+                board[i] = chess;
+                m_evaluate += HAND_SCORE[i - 25] * chess;
+                m_hashcode ^= ZOBRIST_TABLE[i][chess];
+            }
+	}
+
+	recordZobrist[0] = m_hashcode;
 }
 
-void Board::PrintChessBoard() const {
+void Board::PrintChessBoard() const{
 	static const char *RANK_NAME[] = { " A", " B", " C", " D", " E", " F", "  ", " G", "  " };
     int chess;
     int rank_count = 0;
@@ -88,6 +114,7 @@ void Board::PrintChessBoard() const {
         }
         printf("｜%s\n", RANK_NAME[rank_count++]);
     }
+	cout << "Zobrist : " << setw(10) << hex << GetZobristHash() << dec << "\n";
 }
 
 void Board::PrintNoncolorBoard(ostream &os) const {
@@ -108,27 +135,50 @@ void Board::PrintNoncolorBoard(ostream &os) const {
 		os << board[i + 30] << CHESS_WORD[i + 1];
 	}
 	os << "\n";
+	os << "Zobrist : " << setw(10) << hex << GetZobristHash() << dec << "\n";
 }
 
-typedef void(*genmove)(Board &, Action *, U32 &);
-static const genmove move_func[] = { AttackGenerator, MoveGenerator, HandGenerator };
-bool Board::IsGameOver() {
-    Action moveList[MAX_MOVE_NUM];
-    U32 cnt = 0, i = 0;
-    for (int _ = 0; _ < 3; _++) {
-        move_func[_](*this, moveList, cnt);
-        for (; i < cnt &&
-            IsCheckingAfter(ACTION_TO_SRCINDEX(moveList[i]), ACTION_TO_DSTINDEX(moveList[i]));
-            i++);
-        if (i != cnt) break;
-    }
-    if (i == cnt) {
-        PrintChessBoard();
-        cout << "Game Over! " << (m_turn ? "△" : "▼") << " Win!\n";
-        return true;
-    }
+/* 完全重新計算Zobrist */
+void Board::CalZobristNumber() {
+	m_whiteHashcode = 0;
+	m_blackHashcode = 0;
+	for (int i = 0; i < 25; i++) {
+		if (board[i] != BLANK) {
+			m_whiteHashcode ^= ZOBRIST_TABLE[i][board[i]];
+			m_blackHashcode ^= ZOBRIST_TABLE[24 - i][board[i] ^ BLACKCHESS];
+		}
+	}
+	for (int i = 25; i < 37; i++) {
+		if (board[i]) {
+			m_whiteHashcode ^= ZOBRIST_TABLE[i][1];
+			m_blackHashcode ^= ZOBRIST_TABLE[i> 30 ? i - 6 : i + 6][1];
+		}
+		if (board[i] == 2) {
+			m_whiteHashcode ^= ZOBRIST_TABLE[i][2];
+			m_blackHashcode ^= ZOBRIST_TABLE[i> 30 ? i - 6 : i + 6][1];
+		}
+	}
+}
 
-    return false;
+/* 移動完計算Zobrist */
+void Board::CalZobristNumber(int srcIndex, int dstIndex, int srcChess, int dstChess) {
+	m_whiteHashcode ^= ZOBRIST_TABLE[srcIndex][srcChess];
+	m_whiteHashcode ^= ZOBRIST_TABLE[dstIndex][dstChess];
+	if (srcIndex > 24) {
+		/* 打入 */
+		m_blackHashcode ^= ZOBRIST_TABLE[srcIndex > 30 ? srcIndex - 6 : srcIndex + 6][srcChess];
+		m_blackHashcode ^= ZOBRIST_TABLE[24 - dstIndex][dstChess ^ BLACKCHESS];
+	}
+	else if (dstIndex > 24) {
+		/* 吃掉 */
+		m_blackHashcode ^= ZOBRIST_TABLE[24 - srcIndex][srcChess ^ BLACKCHESS];
+		m_blackHashcode ^= ZOBRIST_TABLE[dstIndex > 30 ? dstIndex - 6 : dstIndex + 6][dstChess];
+	}
+	else {
+		/* 移動 */
+		m_blackHashcode ^= ZOBRIST_TABLE[24 - srcIndex][srcChess ^ BLACKCHESS];
+		m_blackHashcode ^= ZOBRIST_TABLE[24 - dstIndex][dstChess ^ BLACKCHESS];
+	}
 }
 
 void Board::DoMove(const Action action) {
@@ -145,13 +195,17 @@ void Board::DoMove(const Action action) {
         if (dstChess = board[dstIndex]) { // 吃
             occupied[m_turn ^ 1] ^= dstboard; // 更新對方場上狀況
             bitboard[dstChess] ^= dstboard; // 更新對方手牌
-            board[EatToHand[dstChess]]++; // 轉為該方手牌
+                                            //board[EatToHand[dstChess]]++; // 轉為該方手牌
             m_evaluate += HAND_SCORE[EatToHand[dstChess] - 25] - CHESS_SCORE[dstChess];
+
+            m_hashcode ^= ZOBRIST_TABLE[dstIndex][dstChess];
+            m_hashcode ^= ZOBRIST_TABLE[EatToHand[dstChess]][++board[EatToHand[dstChess]]];
         }
 
         occupied[m_turn] ^= (1 << srcIndex) | dstboard; // 更新該方場上狀況
         bitboard[srcChess] ^= 1 << srcIndex; // 移除該方手牌原有位置
 
+        m_hashcode ^= ZOBRIST_TABLE[srcIndex][srcChess];
         if (pro) {
             srcChess ^= PROMOTE; // 升變
             m_evaluate += CHESS_SCORE[srcChess] - CHESS_SCORE[srcChess ^ PROMOTE];
@@ -160,26 +214,32 @@ void Board::DoMove(const Action action) {
         board[srcIndex] = BLANK; // 原本清空
     }
     else { // 打入
+        m_hashcode ^= ZOBRIST_TABLE[srcIndex][board[srcIndex]];
+
         srcChess = HandToChess[srcIndex];
         occupied[m_turn] ^= dstboard; // 打入場上的位置
         bitboard[srcChess] ^= dstboard; // 打入該手牌的位置
         board[srcIndex]--; // 減少該手牌
         m_evaluate += CHESS_SCORE[srcChess] - HAND_SCORE[srcIndex - 25];
+
     }
     board[dstIndex] = srcChess; // 放置到目的
-    record.push_back((dstChess << 18) | (srcChess << 12) | action);
+    m_hashcode ^= ZOBRIST_TABLE[dstIndex][srcChess];
 
-	m_turn ^= 1;
+	recordAction[m_step++] = (dstChess << 18) | (srcChess << 12) | action;
+	recordZobrist[m_step] = m_hashcode;
+    m_turn ^= 1;
 }
 
 void Board::UndoMove() {
-    if (record.size() == 0) { // 第零個元素保留用來判斷先後手
+    if (m_step == 0) { // 保險一點 避免出錯
         cout << "Can not undo any more!" << endl;
         return;
     }
-    Action redo = record.back();
-    record.pop_back();
-	m_turn ^= 1;
+
+    m_turn ^= 1;
+    m_hashcode = recordZobrist[--m_step];
+    Action redo = recordAction[m_step];
 
     // 0 board[dst] board[src] dst src
     U32 srcIndex = ACTION_TO_SRCINDEX(redo),
@@ -212,23 +272,11 @@ void Board::UndoMove() {
         occupied[m_turn] ^= dstboard; // 取消打入場上的位置
         bitboard[srcChess] ^= dstboard; // 取消打入該手牌的位置
         board[srcIndex]++; // 收回該手牌
+
         m_evaluate += HAND_SCORE[srcIndex - 25] - CHESS_SCORE[srcChess];
     }
     board[dstIndex] = dstChess; // 還原目的棋
 }
-
-//int Board::Evaluate() {
-//	int i = 0, score = 0;
-//	for (; i < 25; i++) {
-//		if (board[i])
-//			score += CHESS_SCORE[board[i]];
-//	}
-//	for (; i < 35; i++) {
-//		if (board[i])
-//			score += HAND_SCORE[i - 25] * board[i];
-//	}
-//	return m_turn ? score : -score;
-//}
 
 bool Board::SaveBoard(const string filename, const string comment) const {
 	string filepath = BOARD_PATH + filename;
@@ -303,11 +351,14 @@ bool Board::SaveKifu(string filename, const string comment) const {
 	}
 	if (file) {
 		file << "*" << comment << endl;
-		for (int i = 0; i < record.size(); i++) {
-			file << i << " : " << (i % 2 ? "▼" : "△");
-			file << Index2Input(ACTION_TO_SRCINDEX(record[i]));
-			file << Index2Input(ACTION_TO_DSTINDEX(record[i]));
-			file << (ACTION_TO_ISPRO(record[i]) ? "+\n" : "\n");
+		file << "Kifu hash : " << setw(10) << hex << GetKifuHash() << "\n";
+		file << "Initboard : " << setw(10) << hex << recordZobrist[0] << dec /*<< " " << recordSenichite[0]*/ << "\n";
+		for (int i = 0; i < m_step; i++) {
+			file << setw(2) << i << " : " << (i % 2 ? "▼" : "△");
+			file << Index2Input(ACTION_TO_SRCINDEX(recordAction[i]));
+			file << Index2Input(ACTION_TO_DSTINDEX(recordAction[i]));
+			file << (ACTION_TO_ISPRO(recordAction[i]) ? "+" : " ");
+			file << setw(10) << hex << recordZobrist[i + 1] << dec /*<< " " << recordSenichite[i + 1]*/ << "\n";
 		}
 		file.close();
 		cout << "Success Save Kifu to " << filepath << endl;
@@ -317,21 +368,36 @@ bool Board::SaveKifu(string filename, const string comment) const {
 	return false;
 }
 
-// TODO : 目前僅能處理小迴圈 等架構穩定再來考慮完整方案 同時避免速度變慢
-bool Board::IsSennichite(Action action) const {
-	if (record.size() < 5) return false;
-	if (ACTION_TO_SRCINDEX(record[record.size() - 1]) ==
-		ACTION_TO_DSTINDEX(record[record.size() - 3]) &&
-		ACTION_TO_DSTINDEX(record[record.size() - 1]) ==
-		ACTION_TO_SRCINDEX(record[record.size() - 3]) &&
-		ACTION_TO_SRCINDEX(record[record.size() - 2]) == ACTION_TO_DSTINDEX(action) &&
-		ACTION_TO_DSTINDEX(record[record.size() - 2]) == ACTION_TO_SRCINDEX(action)) {
+bool Board::IsGameOver() {
+	Action moveList[MAX_MOVE_NUM] = { 0 };
+	U32 cnt = 0;
+	AttackGenerator(*this, moveList, cnt);
+	if (!cnt)
+		MoveGenerator(*this, moveList, cnt);
+	if (!cnt)
+		HandGenerator(*this, moveList, cnt);
+
+	if (!cnt) {
+		PrintChessBoard();
+		cout << (m_turn ? "White" : "Black") << " Win\n";
 		return true;
+	}
+
+	return false;
+}
+
+// 如果現在盤面曾經出現過 且距離為偶數(代表輪到同個人) 判定為千日手
+// 需要先DoMove後才能判斷 在此不考慮被連將
+bool Board::IsSennichite() const {
+	for (int i = m_step - 4; i > 0; i -= 2) {
+		if (recordZobrist[i] == m_hashcode) {
+			return true;
+		}
 	}
 	return false;
 }
 
-bool Board::IsCheckingAfter(const int src, const int dst) {
+bool Board::IsCheckAfter(const int src, const int dst) {
 	bool isStillChecking = false;
 	U32 dstboard = 1 << dst, moveboard = (1 << src) | dstboard;
 
@@ -379,4 +445,12 @@ bool Board::IsCheckingAfter(const int src, const int dst) {
 		Observer::cutIllgalBranch++;
 	}
 	return isStillChecking;
+}
+
+unsigned int Board::GetKifuHash() const {
+	unsigned int seed = m_step;
+	for (auto& i : recordAction) {
+		seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
+	return seed;
 }

@@ -91,7 +91,7 @@ void AttackGenerator(Board &board, Action *movelist, U32 &start) {
 
 				//if (kingpos && !(Movement[KING][dst] & kingpos)) continue;
 				//if (board.IsChecking() && 
-				//if (board.IsCheckingAfter(src, dst)) continue;
+				//if (board.IsCheckAfter(src, dst)) continue;
 				pro = (A_Promotable[i] && ((1 << src | 1 << dst) & ENEMYCAMP(board.GetTurn()))) ? PRO_MASK : 0;
 				movelist[start++] = pro | (dst << 6) | src;
 			}
@@ -117,7 +117,7 @@ void MoveGenerator(Board &board, Action *movelist, U32 &start) {
 
 				//if (kingpos && !(Movement[KING][dst] & kingpos)) continue;
 				//if (board.IsChecking() && 
-				//if (board.IsCheckingAfter(src, dst)) continue;
+				//if (board.IsCheckAfter(src, dst)) continue;
 				pro = (M_Promotable[i] && ((1 << src | 1 << dst) & ENEMYCAMP(board.GetTurn()))) ? PRO_MASK : 0;
 				movelist[start++] = pro | (dst << 6) | src;
 			}
@@ -126,6 +126,7 @@ void MoveGenerator(Board &board, Action *movelist, U32 &start) {
 }
 
 void HandGenerator(Board &board, Action *movelist, U32 &start) {
+	/* TODO: 利用查找上一步快速判斷有沒有王手，未完成 */
 	//if (board.IsnonBlockable()) return;
 
 	U32 srcboard = 0, dstboard = blank_board, src = (board.GetTurn() ? 30 : 35), dst, nifu = 0;
@@ -138,7 +139,7 @@ void HandGenerator(Board &board, Action *movelist, U32 &start) {
 	while (dstboard) {
 		dst = BitScan(dstboard);
 		dstboard ^= 1 << dst;
-		if (board.IsCheckingAfter(src, dst)) continue;
+		//if (board.IsCheckAfter(src, dst)) continue;
 		srcboard |= 1 << dst;
 	}
 	/*if (board.IsChecking()) {
@@ -193,57 +194,9 @@ void HandGenerator(Board &board, Action *movelist, U32 &start) {
 			nifu |= column_mask(dst); // 二步
 		}
 
-        /************ 打步詰 ************/
-        U32 kingboard = board.bitboard[KING | (board.GetTurn() ? 0 : BLACKCHESS)];
-        U32 pawnboard = board.GetTurn() ? kingboard >> 5 : kingboard << 5;
-
-        if (pawnboard & srcboard) {
-            U32 uchifuzume = pawnboard; // 假設有打步詰
-            U32 kingpos = BitScan(kingboard),
-                pawnpos = BitScan(pawnboard);
-
-            /************ DoMove ************/
-            board.occupied[board.GetTurn()] ^= pawnboard;
-            board.bitboard[PAWN | (board.GetTurn() << 4)] ^= pawnboard;
-            board.NextTurn();
-            /************ DoMove ************/
-
-            // 對方王可 吃/移動 的位置
-            dstboard = Movement[KING][kingpos];
-            dstboard &= dstboard ^ board.occupied[board.GetTurn()];
-            while (dstboard) {
-                dst = BitScan(dstboard);
-                // 如果王移動後脫離被王手
-                if (!board.IsCheckingAfter(kingpos, dst)) {
-                    uchifuzume = 0; // 代表沒有打步詰
-                    break;
-                }
-                dstboard ^= 1 << dst;
-            }
-
-            // 對方可能攻擊到步的棋子 (不包括王)
-            if (uchifuzume) {
-                U32 attackboard = ((RookMove(board, pawnpos) | BishopMove(board, pawnpos)) & board.occupied[board.GetTurn()]) ^ kingboard;
-                while (attackboard) {
-                    U32 attsrc = BitScan(attackboard);
-                    // 如果真的吃得到步 且 吃了之後不會被王手
-                    if ((Movable(board, attsrc) & pawnboard) && !board.IsCheckingAfter(attsrc, pawnpos)) {
-                        uchifuzume = 0; // 代表沒有打步詰
-                        break;
-                    }
-                    attackboard ^= 1 << attsrc;
-                }
-            }
-
-            /************ UnDoMove ************/
-            board.NextTurn();
-            board.occupied[board.GetTurn()] ^= pawnboard;
-            board.bitboard[PAWN | (board.GetTurn() << 4)] ^= pawnboard;
-            /************ UnDoMove ************/
-
-            nifu |= uchifuzume;
-        }
-        /************ 打步詰 ************/
+		/* TODO: 打步詰  (暫時規定王的前方不能打入) */
+		if (board.GetTurn() == BLACK_TURN) nifu |= board.bitboard[KING] >> 5;
+		else nifu |= board.bitboard[KING | BLACKCHESS] << 5;
 
 		dstboard = srcboard & ~(ENEMYCAMP(board.GetTurn()) | nifu);
 		while (dstboard) {

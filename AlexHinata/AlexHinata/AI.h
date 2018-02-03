@@ -2,8 +2,8 @@
 #define _AI_
 #include "head.h"
 
-Action IDAS(Board& board, bool turn, PV &pv);
-int NegaScout(PV &pv, Board& board, int alpha, int beta, int depth, int turn, bool isFailHigh);
+Action IDAS(Board& board, PV &pv);
+int NegaScout(PV &pv, Board& board, int alpha, int beta, int depth, bool isFailHigh);
 int QuiescenceSearch(Board& board, int alpha, int beta);
 int SEE(const Board &board, int dstIndex);
 

@@ -8,7 +8,7 @@ using namespace std;
 /*    Print     */
 const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-inline void SetColor(int color = 8) {
+inline void SetColor(int color = 7) {
     SetConsoleTextAttribute(hConsole, color);
 }
 
@@ -25,6 +25,10 @@ const char SAVE_CHESS_WORD[][5] = {
 	"    ","▼步","▼銀","▼金","▼角","▼飛","▼玉","    ",
 	"    ","▼ㄈ","▼全","    ","▼馬","▼龍"
 };
+
+/*    Player Turn    */
+#define WHITE_TURN 0
+#define BLACK_TURN 1
 
 
 const int EatToHand[] = {
@@ -87,8 +91,8 @@ struct TranspositNode {
 };
 
 struct PV {
-	Action action[IDAS_MAX_DEPTH];
-	int evaluate[IDAS_MAX_DEPTH];
+	Action action[MAX_DEPTH];
+	int evaluate[MAX_DEPTH];
 	int count = 0;
 	int leafEvaluate;
 
@@ -97,19 +101,19 @@ struct PV {
 		for (U32 i = 0; i < count; ++i) {
 			os << i << " : " << (((turn + i) & 1) ? "▼" : "△");
 			PrintAction(os, action[i]);
-			os << setw(7) << evaluate[i] << endl;
+			os << setw(7) << (i % 2 ? -evaluate[i] : evaluate[i]) << endl;
 		}
-		if (leafEvaluate <= -CHECKMATE || leafEvaluate >= CHECKMATE) {
-			os << count << " : " << (((turn + count) & 1) ? "▼" : "△") << "Lose" << endl;
-        }
+		if (leafEvaluate <= -CHECKMATE || CHECKMATE <= leafEvaluate) {
+			os << count << " : " << (((turn + count) & 1) ? "▼" : "△") << "Lose " << setw(7) << leafEvaluate << endl;
+		}
 	}
 };
 
 /*     Evaluate Value     */
 const int CHESS_SCORE[] = {
-    0, -107, -810, -907, -1291, -1670, -CHECKMATE, 0,
+    0, -107, -810, -907, -1291, -1670, 0, 0,
     0, -895, -933,    0, -1985, -2408, 0, 0,
-    0,  107,  810,  907,  1291,  1670, CHECKMATE, 0,
+    0,  107,  810,  907,  1291,  1670, 0, 0,
     0,  895,  933,    0,  1985,  2408, 0, 0,
 };
 

@@ -5,8 +5,7 @@ typedef unsigned __int64 U64;
 typedef unsigned __int32 U32;
 typedef unsigned __int16 U16;
 typedef unsigned __int8   U8;
-//typedef unsigned __int32 Action;
-using Action = unsigned __int32;
+typedef unsigned __int32 Action;
 
 #define HUMAN_CTRL 0
 #define AI_CTRL    1
@@ -16,12 +15,12 @@ using Action = unsigned __int32;
 #define BOARD_SIZE 25
 #define TOTAL_BOARD_SIZE 37
 
-/*     player turn     */
-#define WHITE_TURN 0
-#define BLACK_TURN 1
-
+/*     TURN     */
+#define TURN_WHITE 0
+#define TURN_BLACK 1
 #define PROMOTE 0x08
 #define BLACKCHESS 0x10
+#define EMPTY 0
 
 /*    move    */
 #define blank_board (~(board.occupied[BLACK_TURN] | board.occupied[WHITE_TURN]) & BOARD_MASK)
@@ -35,12 +34,18 @@ using Action = unsigned __int32;
 
 /*    move mask    */
 #define ACTION_TO_SRCINDEX(action) (action & 0x0000003f)
-#define ACTION_TO_DSTINDEX(action) ((action & 0x00000fc0) >> 6)
-#define ACTION_TO_SRCCHESS(action) ((action & 0x0003f000) >> 12)
-#define ACTION_TO_DSTCHESS(action) ((action & 0x00fc0000) >> 18)
-#define ACTION_TO_ISPRO(action)    ((action & 0x01000000) >> 24)
-#define ACTION_TO_DEPTH(action)    ((action & 0x7e000000) >> 25)
+#define ACTION_TO_DSTINDEX(action) (action & 0x00000fc0) >> 6
+#define ACTION_TO_SRCCHESS(action) (action & 0x0003f000) >> 12
+#define ACTION_TO_DSTCHESS(action) (action & 0x00fc0000) >> 18
+#define ACTION_TO_ISPRO(action)    (action & 0x01000000) >> 24
+#define ACTION_TO_DEPTH(action)    (action & 0x7e000000) >> 25
 #define ACTION_TO_ISEXACT(action)  (action >> 31)
+
+
+#define SRC_INDEX_MASK 0x003f
+#define DST_INDEX_MASK 0x0fc0
+#define SRC_CHESS_MASK 0x3f000
+#define DST_CHESS_MASK 0xfc0000
 
 #define PRO_MASK 0x1000000
 #define BOARD_MASK 0x01ffffff
@@ -48,7 +53,7 @@ using Action = unsigned __int32;
 
 // max move number including attack (21) and move (29)
 // and the hand chess (112) (23 * 4 + 20)
-#define MAX_MOVE_NUM 162 // max 162 ; testing max
+#define MAX_MOVE_NUM 112 // max 162 ; testing max
 
 /*    camp    */
 #define WHITE_CAMP 0x1f00000
@@ -59,10 +64,12 @@ using Action = unsigned __int32;
 #define LOWEST_BOARD_POS   0x0000001
 
 /* search depth */
-//#define IDAS_DEPTH   12
-#define IDAS_MAX_DEPTH 18
+//#define IDAS_START_DEPTH 11
+//#define IDAS_END_DEPTH   10
+#define MAX_DEPTH 18
 
 /*    search    */
-#define CHECKMATE    32767//INT_MAX
+#define CHECKMATE       SHRT_MAX //SHRT_MAX INT_MAX
+#define DEPTH_UCHI      3
 
 #endif

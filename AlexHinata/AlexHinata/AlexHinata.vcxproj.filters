@@ -50,9 +50,6 @@
     <ClCompile Include="board.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Minishogi\Minishogi\board.cpp">
-      <Filter>原始程式檔</Filter>
-    </ClCompile>
     <ClCompile Include="MoveGene.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>

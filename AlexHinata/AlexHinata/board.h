@@ -2,7 +2,6 @@
 #define _BOARD_
 #include "head.h"
 
-//不要問L是做什麼 你會怕
 #define BOARD_PATH   "board//"
 #define LBOARD_PATH L"board//"
 #define KIFU_PATH    "output//"
@@ -10,45 +9,54 @@
 
 class Board {
 private:
-    static vector<U32> ZOBRIST_TABLE[TOTAL_BOARD_SIZE];
+    static U64 Board::ZOBRIST_TABLE[TOTAL_BOARD_SIZE][30];
     static const int ZOBRIST_SEED = 10;
 
     bool m_turn;
 	int m_evaluate;
-    U32 m_whiteHashcode;
-    U32 m_blackHashcode;
+    U64 m_whiteHashcode;
+    U64 m_blackHashcode;
+
+    U64 m_hashcode;
+
+	//第i個recordAction動完後的Zobrist儲存在第i+1個recordZobrist
+	//recordZobrist第0個是初始盤面
+    U32 m_step;
+	Action recordAction[256];
+	U64 recordZobrist[256];
 
 public:
     U32 occupied[2];
     U32 bitboard[32];
     int board[TOTAL_BOARD_SIZE];
-    vector<Action> record;
 
     Board();
     ~Board();
     void Initialize();
     void Initialize(const char *str);
-    void DoMove(Action m_Action);
-    void UndoMove();
-    bool IsGameOver();
-    // 已經是了 而且真的蠻快的 (12/21)
-    inline int Evaluate() { return m_turn ? m_evaluate : -m_evaluate; }; //之後改成類似zobrist的方式
     void PrintChessBoard() const;
 	void PrintNoncolorBoard(ostream &os) const;
-	//void CalEvaluate();
-	//void CalZobristNumber();
-	//void CalZobristNumber(int srcIndex, int dstIndex, int srcChess, int dstChess);
+	void CalZobristNumber();
+	void CalZobristNumber(int srcIndex, int dstIndex, int srcChess, int dstChess);
+
+	void DoMove(Action m_Action);
+	void UndoMove();
+
     bool SaveBoard(const string filename, const string comment) const;
     bool LoadBoard(const string filename, int &offset);
 	bool SaveKifu(const string filename, const string comment) const;
 
-	bool IsSennichite(Action action) const;
-	bool IsCheckingAfter(const int src, const int dst);
+	bool IsGameOver();
+	bool IsSennichite() const;
+	bool IsCheckAfter(const int src, const int dst);
     inline bool GetTurn() const { return m_turn; }
-    inline void NextTurn() { m_turn ^= 1; }
-    inline U32 GetHashcode(bool turn) const { return turn ? m_blackHashcode : m_whiteHashcode; }
+	inline int GetStep() const { return m_step; }
+	inline int Evaluate() const { return m_turn ? m_evaluate : -m_evaluate; };
+	inline U64 GetZobristHash() const {
+		//return m_turn ? (m_blackHashcode << 32) | m_whiteHashcode : (m_whiteHashcode << 32) | m_blackHashcode;
+        return m_hashcode;
+	}
+	unsigned int GetKifuHash() const ;
 };
-
-ostream & operator<<(ostream &os, const Board &board);
 
 #endif 
