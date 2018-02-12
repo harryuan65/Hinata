@@ -1,0 +1,26 @@
+*2018-02-10_18-26-52
+Zobrist Table Seed : 11
+Kifu hash : 9ccc375e
+Initboard :   7f18197e96556782
+ 0 : ¡µE2D3   d74eaebc0080dfd2
+ 1 : ¡¿A3B4   404c8f63183f673a
+ 2 : ¡µE3D4   7d76d2f393a1d13f
+ 3 : ¡¿A4B3   740fda852df07725
+ 4 : ¡µD3E2   dc596d47bb25cf75
+ 5 : ¡¿B3C2   8d63e32666ad52a6
+ 6 : ¡µD4C4   90a9ac20cc86f025
+ 7 : ¡¿B4C4   750beea1ff1ca5b6
+ 8 : ¡µE2C4   435f714b383edff7
+ 9 : ¡¿A5A4   3cd82d8e9afdd7eb
+10 : ¡µG4C3   5064ec7c322ecb48
+11 : ¡¿A4C4   482e62d2bd477451
+12 : ¡µE1E2   b464d4b7cde50e4d
+13 : ¡¿C4C3   1462e295f6ed44c8
+14 : ¡µE2C2   4ff591fa05300f8a
+15 : ¡¿C3C2   b5b4adddb3b1a792
+16 : ¡µG2D4   8d26a0af73521e0c
+17 : ¡¿A2B2   3a0546f62cc6e8d6
+18 : ¡µE4E3   1b5ee64a52d77fdd
+19 : ¡¿F1E1   298467411d36e54c
+20 : ¡µD4B2   5b72acd7bcfd0e83
+21 : ¡¿C2B2   44cf28976b5324da

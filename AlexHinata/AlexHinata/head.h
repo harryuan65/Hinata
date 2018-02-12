@@ -1,29 +1,33 @@
 #ifndef _HEAD_
 #define _HEAD_
-#define WINDOWS_10 //WINDOWS_10
-//#define PERFECT_ENDGAME_PV
 #define _CRT_SECURE_NO_WARNINGS
+#define WINDOWS_10
+//#define PV_DISABLE
+//#define BEST_ENDGAME_SEARCH
+//#define TRANSPOSITION_DISABLE
 using namespace std;
 
-#include <iostream>
+#include <algorithm>
+#include <assert.h>
+#include <atlstr.h>
 #include <conio.h>
-#include <iomanip>
+#include <direct.h>
 #include <fstream>
+#include <functional>
+#include <iostream>
+#include <iomanip>
 #include <stdlib.h>
 #include <string>
-#include <assert.h>
-#include <time.h>
-#include <direct.h>
 #include <sstream>
+#include <time.h>
 #include <vector>
-#include <map>
-#include <algorithm>
 #include <Windows.h>
 
 struct TranspositNode;
 struct PV;
 class Board;
 
+#include "Zobrist.h"
 #include "define.h"
 #include "library.h"
 #include "Observer.h"

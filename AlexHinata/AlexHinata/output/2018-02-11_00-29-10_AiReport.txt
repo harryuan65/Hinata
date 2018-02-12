@@ -1,0 +1,21 @@
+#2018-02-11_00-29-10 [2^26] = 64MB
+Zobrist Table Seed : 11
+AI Type : ¡µ¡¿Seed=11, TPSize=0x1000000, TPShift=20
+Game  0 : ¡¿ Win!
+Game Result :
+ Init board zobrist      :   31ee1459d0dd79b9
+ Kifu hashcode           :   aec30b3a
+ Search depths           :         10
+ Search nums             :         19
+ Game play time          :         54.43
+ Winner                  :         ¡¿
+Average Report (per search) :
+ Total search nodes      :   10907489
+ Research nodes          :    5141926
+ Quies search nodes      :          0
+ Avg scout search branch :          1.56
+ Total TP Depth          :    1035490
+ Index Collision nums    :    9303412
+ Eval Collision nums     :          0
+ Search time             :          2.74
+

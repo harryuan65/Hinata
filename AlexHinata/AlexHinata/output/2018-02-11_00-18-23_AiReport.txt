@@ -1,0 +1,21 @@
+#2018-02-11_00-18-23 //自己發生Failed High "true"2
+Zobrist Table Seed : 11
+AI Type : △▼Seed=11, TPSize=0x1000000, TPShift=20
+Game  0 : △ Win!
+Game Result :
+ Init board zobrist      :   31ee176a9b7379b9
+ Kifu hashcode           :    f894023
+ Search depths           :         10
+ Search nums             :         34
+ Game play time          :        247.51
+ Winner                  :         △
+Average Report (per search) :
+ Total search nodes      :   26186817
+ Research nodes          :   11633540
+ Quies search nodes      :          0
+ Avg scout search branch :          1.62
+ Total TP Depth          :    2785431
+ Index Collision nums    :   22088315
+ Eval Collision nums     :          0
+ Search time             :          7.03
+

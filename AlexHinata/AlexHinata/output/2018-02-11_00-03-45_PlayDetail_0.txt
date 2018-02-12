@@ -1,0 +1,957 @@
+#2018-02-11_00-03-45
+Zobrist Table Seed : 11
+---------- Game 0 Step 0 ----------
+▼飛▼角▼銀▼金▼玉
+ ．  ．  ．  ． ▼步
+ ．  ．  ．  ．  ． 
+△步 ．  ．  ．  ． 
+△王△金△銀△角△飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 31ee1413303579b9
+[△ Turn]
+Action : E4D4 
+PV: (depth | turn | action | my evaluate)
+0 : △E4D4       0
+1 : ▼A3B2       0
+2 : △D4C4       0
+3 : ▼A2B3       0
+4 : △E3D4       0
+5 : ▼B3C4    2167
+6 : △E2C4       0
+7 : ▼A4C2       0
+8 : △D4E3       0
+9 : ▼A5D5     259
+PV leaf :     -259
+Search Report :
+ Total search nodes      :   21772906
+ Research nodes          :   12144817
+ Quies search nodes      :          0
+ Avg scout search branch :          1.78
+ Total TP Depth          :    3105959
+ Index Collision nums    :   17661546
+ Eval Collision nums     :          0
+ Search time             :          6.34
+
+---------- Game 0 Step 1 ----------
+▼飛▼角▼銀▼金▼玉
+ ．  ．  ．  ． ▼步
+ ．  ．  ．  ．  ． 
+△步△金 ．  ．  ． 
+△王 ． △銀△角△飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 5d09fb1173c69fc2
+[▼ Turn]
+Action : A3B4 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A3B4       0
+1 : △E2D3       0
+2 : ▼A4B3       0
+3 : △E1E2       0
+4 : ▼A5A3       0
+5 : △E2D2       0
+PV leaf :     -738
+Search Report :
+ Total search nodes      :   22136393
+ Research nodes          :   11408826
+ Quies search nodes      :          0
+ Avg scout search branch :          1.73
+ Total TP Depth          :    3073309
+ Index Collision nums    :   17146502
+ Eval Collision nums     :          0
+ Search time             :          6.27
+
+---------- Game 0 Step 2 ----------
+▼飛▼角 ． ▼金▼玉
+ ． ▼銀 ．  ． ▼步
+ ．  ．  ．  ．  ． 
+△步△金 ．  ．  ． 
+△王 ． △銀△角△飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 8346236fe9fc52d7
+[△ Turn]
+Action : E2D3 
+PV: (depth | turn | action | my evaluate)
+0 : △E2D3       0
+1 : ▼A4B3       0
+2 : △E3D2       0
+3 : ▼A5A3       0
+4 : △D3E4       0
+5 : ▼B4A5       0
+6 : △E1E3       0
+7 : ▼B3D5     259
+8 : △E3A3+   4147
+9 : ▼A2A3     259
+PV leaf :     -259
+Search Report :
+ Total search nodes      :   14414539
+ Research nodes          :    6394188
+ Quies search nodes      :          0
+ Avg scout search branch :          1.63
+ Total TP Depth          :    1719778
+ Index Collision nums    :   11459555
+ Eval Collision nums     :          0
+ Search time             :          3.89
+
+---------- Game 0 Step 3 ----------
+▼飛▼角 ． ▼金▼玉
+ ． ▼銀 ．  ． ▼步
+ ．  ．  ．  ．  ． 
+△步△金△角 ．  ． 
+△王 ． △銀 ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 57681b248d39b028
+[▼ Turn]
+Action : A2B2 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A2B2       0
+PV leaf :    -1200
+Search Report :
+ Total search nodes      :   14775869
+ Research nodes          :    6125537
+ Quies search nodes      :          0
+ Avg scout search branch :          1.65
+ Total TP Depth          :    1895680
+ Index Collision nums    :   11606704
+ Eval Collision nums     :          0
+ Search time             :          4.28
+
+---------- Game 0 Step 4 ----------
+▼飛▼角 ．  ． ▼玉
+ ． ▼銀 ． ▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角 ．  ． 
+△王 ． △銀 ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist :  f26e3a6a4ab02bd
+[△ Turn]
+Action : E3D2 
+PV: (depth | turn | action | my evaluate)
+0 : △E3D2       0
+1 : ▼A4B3       0
+2 : △E1E2       0
+3 : ▼A5A3       0
+4 : △E2E3       0
+5 : ▼A3A4       0
+6 : △D3E2       0
+7 : ▼B4A3       0
+8 : △D4C5       0
+9 : ▼A4E4+    738
+PV leaf :     -738
+Search Report :
+ Total search nodes      :   18519803
+ Research nodes          :    9722408
+ Quies search nodes      :          0
+ Avg scout search branch :          1.80
+ Total TP Depth          :    3051161
+ Index Collision nums    :   13955638
+ Eval Collision nums     :          0
+ Search time             :          5.70
+
+---------- Game 0 Step 5 ----------
+▼飛▼角 ．  ． ▼玉
+ ． ▼銀 ． ▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角△銀 ． 
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 24eb1e26a4862963
+[▼ Turn]
+Action : A4B3 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A4B3       0
+1 : △E1E2       0
+2 : ▼A5A2       0
+3 : △E2E1       0
+4 : ▼A2A3       0
+5 : △D3B5       0
+6 : ▼B4A5       0
+7 : △E5E4       0
+8 : ▼A3A2       0
+9 : △B5A4+    694
+PV leaf :     -694
+Search Report :
+ Total search nodes      :   17081558
+ Research nodes          :    9495050
+ Quies search nodes      :          0
+ Avg scout search branch :          1.71
+ Total TP Depth          :    2648123
+ Index Collision nums    :   12828910
+ Eval Collision nums     :          0
+ Search time             :          4.84
+
+---------- Game 0 Step 6 ----------
+▼飛 ．  ．  ． ▼玉
+ ． ▼銀▼角▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角△銀 ． 
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : ad6cbe9d7c500726
+[△ Turn]
+Action : E5E4 
+PV: (depth | turn | action | my evaluate)
+0 : △E5E4       0
+1 : ▼B3D5     259
+2 : △E4E3    -259
+3 : ▼D5C4     259
+4 : △D3C4    2496
+PV leaf :     -997
+Search Report :
+ Total search nodes      :   22579327
+ Research nodes          :   10966123
+ Quies search nodes      :          0
+ Avg scout search branch :          1.79
+ Total TP Depth          :    3916699
+ Index Collision nums    :   16614118
+ Eval Collision nums     :          0
+ Search time             :          6.29
+
+---------- Game 0 Step 7 ----------
+▼飛 ．  ．  ． ▼玉
+ ． ▼銀▼角▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角△銀 ． 
+ ． △王 ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : ebb0b94c84696cb7
+[▼ Turn]
+Action : A5A4 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A5A4       0
+1 : △E4E5       0
+2 : ▼B4C4       0
+3 : △D4C4    1920
+PV leaf :     -493
+Search Report :
+ Total search nodes      :   17267246
+ Research nodes          :    9500067
+ Quies search nodes      :          0
+ Avg scout search branch :          1.80
+ Total TP Depth          :    2766217
+ Index Collision nums    :   13082332
+ Eval Collision nums     :          0
+ Search time             :          4.84
+
+---------- Game 0 Step 8 ----------
+ ． ▼飛 ．  ． ▼玉
+ ． ▼銀▼角▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角△銀 ． 
+ ． △王 ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 3d169ca9a06136c7
+[△ Turn]
+Action : E4E5 
+PV: (depth | turn | action | my evaluate)
+0 : △E4E5       0
+1 : ▼B3A2       0
+2 : △E1E4       0
+3 : ▼A4A3       0
+4 : △D3E2       0
+5 : ▼B4A5       0
+6 : △E4E3       0
+7 : ▼A3A4       0
+8 : △D4C5       0
+9 : ▼A4E4+    738
+PV leaf :     -738
+Search Report :
+ Total search nodes      :   19505341
+ Research nodes          :   11318096
+ Quies search nodes      :          0
+ Avg scout search branch :          1.84
+ Total TP Depth          :    3786387
+ Index Collision nums    :   13879972
+ Eval Collision nums     :          0
+ Search time             :          6.35
+
+---------- Game 0 Step 9 ----------
+ ． ▼飛 ．  ． ▼玉
+ ． ▼銀▼角▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角△銀 ． 
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 7bca9b7858585d56
+[▼ Turn]
+Action : A4A2 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A4A2       0
+1 : △E5E4       0
+2 : ▼A2A3       0
+3 : △E4E3       0
+4 : ▼A3A5       0
+PV leaf :      738
+Search Report :
+ Total search nodes      :   10976272
+ Research nodes          :    4986017
+ Quies search nodes      :          0
+ Avg scout search branch :          1.79
+ Total TP Depth          :    1951936
+ Index Collision nums    :    7659364
+ Eval Collision nums     :          0
+ Search time             :          3.35
+
+---------- Game 0 Step 10 ----------
+ ．  ．  ． ▼飛▼玉
+ ． ▼銀▼角▼金▼步
+ ．  ．  ．  ．  ． 
+△步△金△角△銀 ． 
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 3eeeabb5fda1f2d3
+[△ Turn]
+Action : D2C3 
+PV: (depth | turn | action | my evaluate)
+0 : △D2C3       0
+1 : ▼B4C3    1920
+PV leaf :        0
+Search Report :
+ Total search nodes      :   19057837
+ Research nodes          :    8456551
+ Quies search nodes      :          0
+ Avg scout search branch :          1.93
+ Total TP Depth          :    4128533
+ Index Collision nums    :   12712011
+ Eval Collision nums     :          0
+ Search time             :          5.78
+
+---------- Game 0 Step 11 ----------
+ ．  ．  ． ▼飛▼玉
+ ． ▼銀▼角▼金▼步
+ ．  ． △銀 ．  ． 
+△步△金△角 ．  ． 
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 7d1c5d96a39dfd77
+[▼ Turn]
+Action : B4C3 
+PV: (depth | turn | action | my evaluate)
+0 : ▼B4C3    1920
+1 : △D4C3       0
+2 : ▼F4D2    -300
+3 : △C3B3    3055
+PV leaf :    -1459
+Search Report :
+ Total search nodes      :    4764309
+ Research nodes          :    1160807
+ Quies search nodes      :          0
+ Avg scout search branch :          1.56
+ Total TP Depth          :     510424
+ Index Collision nums    :    4054430
+ Eval Collision nums     :          0
+ Search time             :          1.25
+
+---------- Game 0 Step 12 ----------
+ ．  ．  ． ▼飛▼玉
+ ．  ． ▼角▼金▼步
+ ．  ． ▼銀 ．  ． 
+△步△金△角 ．  ． 
+△王 ．  ．  ． △飛
+▼0步1銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 7064fb0222474ada
+[△ Turn]
+Action : D4C3 
+PV: (depth | turn | action | my evaluate)
+0 : △D4C3       0
+1 : ▼A2A4       0
+2 : △C3B2    2167
+3 : ▼A1B2       0
+PV leaf :     -244
+Search Report :
+ Total search nodes      :    8447119
+ Research nodes          :    4581978
+ Quies search nodes      :          0
+ Avg scout search branch :          1.93
+ Total TP Depth          :    1094454
+ Index Collision nums    :    7017878
+ Eval Collision nums     :          0
+ Search time             :          2.49
+
+---------- Game 0 Step 13 ----------
+ ．  ．  ． ▼飛▼玉
+ ．  ． ▼角▼金▼步
+ ．  ． △金 ．  ． 
+△步 ． △角 ．  ． 
+△王 ．  ．  ． △飛
+▼0步1銀0金0角0飛
+△0步1銀0金0角0飛
+Zobrist : bc17ab62c3a0e15b
+[▼ Turn]
+Action : F4D1 
+PV: (depth | turn | action | my evaluate)
+0 : ▼F4D1    -300
+1 : △C3B3    3055
+2 : ▼D1E1+    736
+3 : △B3A2    2932
+4 : ▼B2A2    -765
+PV leaf :    -1273
+Search Report :
+ Total search nodes      :   41795185
+ Research nodes          :   16428774
+ Quies search nodes      :          0
+ Avg scout search branch :          1.64
+ Total TP Depth          :    5716126
+ Index Collision nums    :   34265063
+ Eval Collision nums     :          0
+ Search time             :         11.90
+
+---------- Game 0 Step 14 ----------
+ ．  ．  ． ▼飛▼玉
+ ．  ． ▼角▼金▼步
+ ．  ． △金 ．  ． 
+△步 ． △角 ． ▼銀
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步1銀0金0角0飛
+Zobrist : 9cd29737a091cfeb
+[△ Turn]
+Action : C3B3 
+PV: (depth | turn | action | my evaluate)
+0 : △C3B3    3055
+1 : ▼D1E1+    736
+2 : △G2D4    -909
+3 : ▼E1D1     909
+4 : △D3C4    -909
+5 : ▼F1E1     581
+6 : △G4E4    -881
+7 : ▼E1E4+   3539
+8 : △E5E4     867
+9 : ▼A2A3    -867
+PV leaf :      867
+Search Report :
+ Total search nodes      :    6276541
+ Research nodes          :    2098869
+ Quies search nodes      :          0
+ Avg scout search branch :          2.31
+ Total TP Depth          :    1200821
+ Index Collision nums    :    4849724
+ Eval Collision nums     :          0
+ Search time             :          1.88
+
+---------- Game 0 Step 15 ----------
+ ．  ．  ． ▼飛▼玉
+ ．  ． △金▼金▼步
+ ．  ．  ．  ．  ． 
+△步 ． △角 ． ▼銀
+△王 ．  ．  ． △飛
+▼0步0銀0金0角0飛
+△0步1銀0金1角0飛
+Zobrist : e36ba08c9737d068
+[▼ Turn]
+Action : B2B3 
+PV: (depth | turn | action | my evaluate)
+0 : ▼B2B3    -888
+1 : △E1D1    2808
+2 : ▼F3C2   -3161
+3 : △D3C2    5328
+PV leaf :    -2832
+Search Report :
+ Total search nodes      :   22554914
+ Research nodes          :   10898196
+ Quies search nodes      :          0
+ Avg scout search branch :          1.69
+ Total TP Depth          :    3704774
+ Index Collision nums    :   17587113
+ Eval Collision nums     :          0
+ Search time             :          6.32
+
+---------- Game 0 Step 16 ----------
+ ．  ．  ． ▼飛▼玉
+ ．  ． ▼金 ． ▼步
+ ．  ．  ．  ．  ． 
+△步 ． △角 ． ▼銀
+△王 ．  ．  ． △飛
+▼0步0銀1金0角0飛
+△0步1銀0金1角0飛
+Zobrist : 90e69097eb9263c3
+[△ Turn]
+Action : E1D1 
+PV: (depth | turn | action | my evaluate)
+0 : △E1D1    2808
+1 : ▼A2B2   -2808
+2 : △G4A3    2508
+3 : ▼B3A3    -588
+PV leaf :     2008
+Search Report :
+ Total search nodes      :   50499919
+ Research nodes          :   40498474
+ Quies search nodes      :          0
+ Avg scout search branch :          2.11
+ Total TP Depth          :    9453773
+ Index Collision nums    :   36891389
+ Eval Collision nums     :          0
+ Search time             :         15.02
+
+---------- Game 0 Step 17 ----------
+ ．  ．  ． ▼飛▼玉
+ ．  ． ▼金 ． ▼步
+ ．  ．  ．  ．  ． 
+△步 ． △角 ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀1金0角0飛
+△0步2銀0金1角0飛
+Zobrist : 8b2db5016045b11e
+[▼ Turn]
+Action : A2B2 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A2B2   -2808
+1 : △G4D2    2508
+2 : ▼F3C4   -2861
+3 : △D3E4    2861
+4 : ▼B3A3   -2861
+5 : △G2C2    2688
+6 : ▼B2B4   -2688
+7 : △D2E3    2688
+8 : ▼B4B2   -2688
+9 : △C2A4+   3382
+PV leaf :    -3382
+Search Report :
+ Total search nodes      :  167690561
+ Research nodes          :   73499315
+ Quies search nodes      :          0
+ Avg scout search branch :          1.54
+ Total TP Depth          :   22163003
+ Index Collision nums    :  130341304
+ Eval Collision nums     :          0
+ Search time             :         45.04
+
+---------- Game 0 Step 18 ----------
+ ．  ．  ．  ． ▼玉
+ ．  ． ▼金▼飛▼步
+ ．  ．  ．  ．  ． 
+△步 ． △角 ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀1金0角0飛
+△0步2銀0金1角0飛
+Zobrist : 3022014078aed5de
+[△ Turn]
+Action : G4A3 
+PV: (depth | turn | action | my evaluate)
+0 : △G4A3    2508
+1 : ▼B3A3    -588
+PV leaf :     1863
+Search Report :
+ Total search nodes      :  208971164
+ Research nodes          :  117691482
+ Quies search nodes      :          0
+ Avg scout search branch :          2.13
+ Total TP Depth          :   43840187
+ Index Collision nums    :  144436689
+ Eval Collision nums     :          0
+ Search time             :         64.08
+
+---------- Game 0 Step 19 ----------
+ ．  ． △銀 ． ▼玉
+ ．  ． ▼金▼飛▼步
+ ．  ．  ．  ．  ． 
+△步 ． △角 ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀1金0角0飛
+△0步1銀0金1角0飛
+Zobrist : f5736939033844c9
+[▼ Turn]
+Action : B3A3 
+PV: (depth | turn | action | my evaluate)
+0 : ▼B3A3    -588
+1 : △G2D4     415
+2 : ▼A1A2    -415
+3 : △G4C3     115
+4 : ▼A3B3    -115
+5 : △C3B2    3783
+6 : ▼B3B2   -1863
+7 : △D1D2    1863
+8 : ▼B2C2   -1863
+9 : △D3C2    4030
+PV leaf :    -4030
+Search Report :
+ Total search nodes      :   81329890
+ Research nodes          :   23365910
+ Quies search nodes      :          0
+ Avg scout search branch :          1.62
+ Total TP Depth          :    8130598
+ Index Collision nums    :   66699424
+ Eval Collision nums     :          0
+ Search time             :         21.82
+
+---------- Game 0 Step 20 ----------
+ ．  ． ▼金 ． ▼玉
+ ．  ．  ． ▼飛▼步
+ ．  ．  ．  ．  ． 
+△步 ． △角 ． △飛
+△王 ．  ．  ．  ． 
+▼0步1銀1金0角0飛
+△0步1銀0金1角0飛
+Zobrist : 178acf68ff669121
+[△ Turn]
+Action : G4C2 
+PV: (depth | turn | action | my evaluate)
+0 : △G4C2     288
+1 : ▼F3C1    -641
+2 : △G2C3     468
+3 : ▼C1C2    1452
+4 : △D3C2     715
+5 : ▼A1A2    -715
+6 : △C3B2    4383
+7 : ▼A3B2   -1628
+8 : △C2D3    1628
+9 : ▼B2C1   -1628
+PV leaf :     1628
+Search Report :
+ Total search nodes      :  447983586
+ Research nodes          :  261653415
+ Quies search nodes      :          0
+ Avg scout search branch :          2.01
+ Total TP Depth          :   75702276
+ Index Collision nums    :  333262429
+ Eval Collision nums     :          0
+ Search time             :        131.20
+
+---------- Game 0 Step 21 ----------
+ ．  ． ▼金 ． ▼玉
+ ．  ．  ． ▼飛▼步
+ ．  ．  ． △銀 ． 
+△步 ． △角 ． △飛
+△王 ．  ．  ．  ． 
+▼0步1銀1金0角0飛
+△0步0銀0金1角0飛
+Zobrist : 8f0ecdc6dd1b8868
+[▼ Turn]
+Action : B2C2 
+PV: (depth | turn | action | my evaluate)
+0 : ▼B2C2    1632
+1 : △D3C2    2036
+2 : ▼F3B2   -2389
+3 : △G1E3    2061
+4 : ▼F4C3   -2361
+5 : △E3C3    4281
+6 : ▼B2C3    -613
+7 : △G2A5     440
+PV leaf :    -3301
+Search Report :
+ Total search nodes      :   50309756
+ Research nodes          :    8005181
+ Quies search nodes      :          0
+ Avg scout search branch :          1.52
+ Total TP Depth          :    4876870
+ Index Collision nums    :   39957059
+ Eval Collision nums     :          0
+ Search time             :         12.91
+
+---------- Game 0 Step 22 ----------
+ ．  ． ▼金 ． ▼玉
+ ．  ．  ．  ． ▼步
+ ．  ．  ． ▼飛 ． 
+△步 ． △角 ． △飛
+△王 ．  ．  ．  ． 
+▼0步2銀1金0角0飛
+△0步0銀0金1角0飛
+Zobrist : c584a73c3d439557
+[△ Turn]
+Action : D3C2 
+PV: (depth | turn | action | my evaluate)
+0 : △D3C2    2036
+1 : ▼F3B2   -2389
+2 : △G2D4    2216
+3 : ▼A1A2   -2216
+4 : △C2D3    2216
+5 : ▼F4C3   -2516
+6 : △D4C3    4436
+7 : ▼B2C3   -1681
+PV leaf :     1940
+Search Report :
+ Total search nodes      :   96172630
+ Research nodes          :   46772177
+ Quies search nodes      :          0
+ Avg scout search branch :          2.43
+ Total TP Depth          :   21688700
+ Index Collision nums    :   61101101
+ Eval Collision nums     :          0
+ Search time             :         29.92
+
+---------- Game 0 Step 23 ----------
+ ．  ． ▼金 ． ▼玉
+ ．  ．  ．  ． ▼步
+ ．  ．  ． △角 ． 
+△步 ．  ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步2銀1金0角0飛
+△0步0銀0金1角1飛
+Zobrist : f6ad33390d11b261
+[▼ Turn]
+Action : F3B2 
+PV: (depth | turn | action | my evaluate)
+0 : ▼F3B2   -2389
+1 : △G2D4    2216
+2 : ▼F4A2   -2516
+3 : △D1D3    2516
+4 : ▼F4C4   -2816
+5 : △D3A3+   5721
+6 : ▼C4D4   -2966
+7 : △E5D4    4886
+8 : ▼B2C2   -2131
+9 : △A3A2    4051
+PV leaf :    -4051
+Search Report :
+ Total search nodes      :  496410665
+ Research nodes          :  181731735
+ Quies search nodes      :          0
+ Avg scout search branch :          1.64
+ Total TP Depth          :   69876924
+ Index Collision nums    :  371774118
+ Eval Collision nums     :          0
+ Search time             :        124.52
+
+---------- Game 0 Step 24 ----------
+ ．  ． ▼金 ． ▼玉
+ ．  ．  ． ▼金▼步
+ ．  ．  ． △角 ． 
+△步 ．  ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步2銀0金0角0飛
+△0步0銀0金1角1飛
+Zobrist : 88fc43d980c12a8b
+[△ Turn]
+Action : G2D4 
+PV: (depth | turn | action | my evaluate)
+0 : △G2D4    2216
+1 : ▼F4C1   -2516
+2 : △D1C1    4436
+3 : ▼A1A2   -4436
+4 : △C1E1    4436
+5 : ▼F4D2   -4736
+6 : △G4B3    4436
+7 : ▼A3B3   -2516
+8 : △G1A5    2188
+9 : ▼B3A3   -2188
+PV leaf :     2188
+Search Report :
+ Total search nodes      :  233867831
+ Research nodes          :  128603329
+ Quies search nodes      :          0
+ Avg scout search branch :          2.45
+ Total TP Depth          :   54133136
+ Index Collision nums    :  147619807
+ Eval Collision nums     :          0
+ Search time             :         73.08
+
+---------- Game 0 Step 25 ----------
+ ．  ． ▼金 ． ▼玉
+ ．  ．  ． ▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步2銀0金0角0飛
+△0步0銀0金0角1飛
+Zobrist : 3e121e80c572b2a9
+[▼ Turn]
+Action : F4A2 
+PV: (depth | turn | action | my evaluate)
+0 : ▼F4A2   -2516
+1 : △G1A5    2188
+2 : ▼F4C3   -2488
+3 : △A5A3+   5393
+4 : ▼C3D4   -2638
+PV leaf :    -4461
+Search Report :
+ Total search nodes      :   61315391
+ Research nodes          :   23664994
+ Quies search nodes      :          0
+ Avg scout search branch :          1.43
+ Total TP Depth          :    5945561
+ Index Collision nums    :   48845009
+ Eval Collision nums     :          0
+ Search time             :         15.72
+
+---------- Game 0 Step 26 ----------
+ ．  ． ▼金▼銀▼玉
+ ．  ．  ． ▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步1銀0金0角0飛
+△0步0銀0金0角1飛
+Zobrist : ec20a8257f73e129
+[△ Turn]
+Action : G1A5 
+PV: (depth | turn | action | my evaluate)
+0 : △G1A5    2188
+1 : ▼F4B4   -2488
+2 : △A5B5+   3226
+3 : ▼A2B3   -3226
+4 : △B5B4    5146
+5 : ▼A3B4    -740
+6 : △D1B1     999
+7 : ▼A1A2    -999
+8 : △B1B2    3166
+9 : ▼A2A1   -3166
+PV leaf :     3166
+Search Report :
+ Total search nodes      :   25572616
+ Research nodes          :    8274551
+ Quies search nodes      :          0
+ Avg scout search branch :          2.54
+ Total TP Depth          :    5047983
+ Index Collision nums    :   18182435
+ Eval Collision nums     :          0
+ Search time             :          7.49
+
+---------- Game 0 Step 27 ----------
+△飛 ． ▼金▼銀▼玉
+ ．  ．  ． ▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步1銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : 33560c33c401b8c9
+[▼ Turn]
+Action : F4B4 
+PV: (depth | turn | action | my evaluate)
+0 : ▼F4B4   -2488
+1 : △A5B5+   3226
+2 : ▼A2B3   -3226
+3 : △B5B4    5146
+4 : ▼A3B4    -740
+5 : △D1B1     999
+6 : ▼A1A2    -999
+7 : △B1B2    3166
+8 : ▼A2A1   -3166
+9 : △C2B3    5086
+PV leaf :    -5086
+Search Report :
+ Total search nodes      :   11191552
+ Research nodes          :    2060263
+ Quies search nodes      :          0
+ Avg scout search branch :          1.40
+ Total TP Depth          :    1101826
+ Index Collision nums    :    9099980
+ Eval Collision nums     :          0
+ Search time             :          2.67
+
+---------- Game 0 Step 28 ----------
+△飛 ． ▼金▼銀▼玉
+ ． ▼銀 ． ▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : b27b1d5dacb15e2c
+[△ Turn]
+Action : A5B5+
+PV: (depth | turn | action | my evaluate)
+0 : △A5B5+   3226
+1 : ▼A2B3   -3226
+2 : △B5B4    5146
+3 : ▼A1A2   -5146
+4 : △D4B2    7313
+5 : ▼A2B2   -4558
+6 : △G4C3    4258
+7 : ▼B2C2   -1503
+PV leaf :     4517
+Search Report :
+ Total search nodes      :    5604118
+ Research nodes          :    2528434
+ Quies search nodes      :          0
+ Avg scout search branch :          2.59
+ Total TP Depth          :    1190790
+ Index Collision nums    :    4093482
+ Eval Collision nums     :          0
+ Search time             :          1.66
+
+---------- Game 0 Step 29 ----------
+ ．  ． ▼金▼銀▼玉
+△龍▼銀 ． ▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : d5a170fcd070b8b3
+[▼ Turn]
+Action : A2B3 
+PV: (depth | turn | action | my evaluate)
+0 : ▼A2B3   -3226
+1 : △B5B4    5146
+2 : ▼A1A2   -5146
+3 : △C2B3    7066
+PV leaf :    -6478
+Search Report :
+ Total search nodes      :    7098689
+ Research nodes          :    1601559
+ Quies search nodes      :          0
+ Avg scout search branch :          1.41
+ Total TP Depth          :     761827
+ Index Collision nums    :    5702710
+ Eval Collision nums     :          0
+ Search time             :          1.93
+
+---------- Game 0 Step 30 ----------
+ ．  ． ▼金 ． ▼玉
+△龍▼銀▼銀▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀0金0角0飛
+△0步0銀0金0角0飛
+Zobrist : cf7a1f91360b57f5
+[△ Turn]
+Action : B5B4 
+PV: (depth | turn | action | my evaluate)
+0 : △B5B4    5146
+1 : ▼B3C2   -2391
+2 : △B4A3    4558
+3 : ▼F2A2   -4731
+4 : △D4B2    6898
+5 : ▼Lose   30000
+PV leaf :    30000
+Search Report :
+ Total search nodes      :    5966083
+ Research nodes          :    3364659
+ Quies search nodes      :          0
+ Avg scout search branch :          2.70
+ Total TP Depth          :    1200598
+ Index Collision nums    :    4340832
+ Eval Collision nums     :          0
+ Search time             :          2.02
+
+---------- Game 0 Step 31 ----------
+ ．  ． ▼金 ． ▼玉
+ ． △龍▼銀▼金▼步
+ ．  ．  ． △角 ． 
+△步△角 ．  ． △飛
+△王 ．  ．  ．  ． 
+▼0步0銀0金0角0飛
+△0步1銀0金0角0飛
+Zobrist : 9160bcae755f565f
+[▼ Turn]
+PV: (depth | turn | action | my evaluate)
+0 : ▼B3C2   -2391
+1 : △B4A3    4558
+2 : ▼F2A2   -4731
+3 : △D4B2    6898
+4 : ▼Lose  -30000
+PV leaf :   -30000
+Search Report :
+ Total search nodes      :   13610446
+ Research nodes          :    1092941
+ Quies search nodes      :          0
+ Avg scout search branch :          1.41
+ Total TP Depth          :    1424910
+ Index Collision nums    :   10889902
+ Eval Collision nums     :          0
+ Search time             :          3.40
+

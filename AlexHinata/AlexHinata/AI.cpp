@@ -1,37 +1,68 @@
 #include "AI.h"
 
-U32 max_move[3] = { 0 };
+/*    Negascout Algorithm    */
+
+//U32 max_move[3] = { 0 };
 
 typedef void(*genmove)(Board &, Action *, U32 &);
 static const genmove move_func[] = { AttackGenerator, MoveGenerator, HandGenerator };
 
-map<U32, TranspositNode> transpositTable;
-
 Action IDAS(Board& board, PV &pv) {
     cout << "IDAS Searching " << Observer::depth << " Depth..." << endl;
 	pv.leafEvaluate = NegaScout(pv, board, -CHECKMATE, CHECKMATE, Observer::depth, false);
-	cout << "pvleaf : " << pv.leafEvaluate << endl;
-    if (pv.count == 0 || pv.leafEvaluate <= -CHECKMATE)
+    if (/*pv.count == 0 || */pv.leafEvaluate <= -CHECKMATE)
 		return 0;
 	return pv.action[0];
 }
 
+/*    Transposition Table    */
+static TransPosition* transpositTable = nullptr;
+
 int NegaScout(PV &pv, Board &board, int alpha, int beta, int depth, bool isResearch) {
-	Observer::totalNode++;
-	Observer::researchNode += isResearch;
+	Observer::data[Observer::DataType::totalNode]++;
+	Observer::data[Observer::DataType::researchNode] += isResearch;
+
+	int bestScore = -CHECKMATE;
+	int n = beta;
+	PV tempPV;
+	U32 accCnt = 0;
+	U64 zobrist = board.GetZobristHash();
+
+	Observer::data[Observer::DataType::scoutGeneNums]++;
 	pv.count = 0;
 
-    if (depth == 0) {
-        //pv.count = 0;
-		//Observer::totalNode--; //不然會重複計數
-		return board.Evaluate();//QuiescenceSearch(board, alpha, beta, turn);
+#ifndef TRANSPOSITION_DISABLE
+    int origin_alpha = alpha;
+    TransPosition *p = &transpositTable[(zobrist & TPMask)];
+    if (p->L_hash != (zobrist >> 32)) { // Collision
+        Observer::data[Observer::DataType::indexCollisionNums]++;
     }
+    else if (p->depth >= depth) { // hash hit!
+        Observer::data[Observer::DataType::totalTPDepth] += depth;
+        switch (p->state) {
+        case TransPosition::Exact:
+            /* Exact */
+            return p->value;
+        case TransPosition::Unknown:
+            /* Value在(-Infinity, value] */
+            beta = min(p->value, beta);
+            break;
+        case TransPosition::FailHigh:
+            /* Failed-High */
+            alpha = max(p->value, alpha);
+            break;
+        }
 
-    int bestScore = -CHECKMATE;
-    int n = beta;
-    PV tempPV;
-    U32 accCnt = 0;
-	Observer::scoutGeneNums++;
+        if (alpha >= beta)
+            return p->value;
+    }
+#endif
+
+    if (depth == 0) {
+		//Observer::data[Observer::DataType::totalNode]--; //不然會重複計數
+		return board.Evaluate();
+        //return QuiescenceSearch(board, alpha, beta);
+    }
     /* 分三個步驟搜尋 [攻擊 移動 打入] */
     for (int i = 0; i < 3; i++) {
         Action moveList[MAX_MOVE_NUM];
@@ -45,11 +76,9 @@ int NegaScout(PV &pv, Board &board, int alpha, int beta, int depth, bool isResea
 				continue;
 			}
 
-            /* Search Depth */
             board.DoMove(moveList[j]);
-
-			// 千日手 且 沒有被將軍 (連將時攻擊者判輸) TODO : 判斷是否被將軍
 			if (board.IsSennichite() /*&& !(DoMove()前被將軍)*/ ) {
+				/* 千日手 且 沒有被將軍 (連將時攻擊者判輸) TODO : 判斷是否被將軍 */
 				board.UndoMove();
 				accCnt--;
 				continue;
@@ -60,58 +89,85 @@ int NegaScout(PV &pv, Board &board, int alpha, int beta, int depth, bool isResea
 					bestScore = score;
 				else
 					bestScore = -NegaScout(tempPV, board, -beta, -score + 1, depth - 1, true);
-				// Save PV
+#ifndef PV_DISABLE
 				pv.action[0] = moveList[j];
 				pv.evaluate[0] = -board.Evaluate();
 				memcpy(pv.action + 1, tempPV.action, tempPV.count * sizeof(Action));
 				memcpy(pv.evaluate + 1, tempPV.evaluate, tempPV.count * sizeof(int));
 				pv.count = tempPV.count + 1;
-				//Debug
-				//if (depth != pv.count && bestScore != CHECKMATE && bestScore != -CHECKMATE)
-				//	system("pause");
+#else
+				if (depth == Observer::depth) {
+					pv.action[0] = moveList[j];
+					pv.evaluate[0] = -board.Evaluate();
+					memcpy(pv.action + 1, tempPV.action, tempPV.count * sizeof(Action));
+					memcpy(pv.evaluate + 1, tempPV.evaluate, tempPV.count * sizeof(int));
+					pv.count = tempPV.count + 1;
+				}
+#endif
 			}
-			// moveList的第一個action是必輸的話照樣儲存pv 才能在必輸下得到pv
+#ifndef PV_DISABLE
 			else if (pv.count == 0 && score == -CHECKMATE) {
-				// Save PV
+				/* moveList的第一個action是必輸的話照樣儲存pv 才能在必輸下得到pv */
 				pv.action[0] = moveList[j];
 				pv.evaluate[0] = -board.Evaluate();
 				memcpy(pv.action + 1, tempPV.action, tempPV.count * sizeof(Action));
 				memcpy(pv.evaluate + 1, tempPV.evaluate, tempPV.count * sizeof(int));
 				pv.count = tempPV.count + 1;
-				//Debug
-				//if (depth != pv.count && bestScore != CHECKMATE && bestScore != -CHECKMATE)
-				//	system("pause");
 			}
+#endif
             board.UndoMove();
 
-			// Beta cutoff
 			if (bestScore >= beta) {
-				Observer::scoutSearchBranch += accCnt + j;
+				/* Beta cutoff */
+				Observer::data[Observer::DataType::scoutSearchBranch] += accCnt + j;
+#ifndef TRANSPOSITION_DISABLE
+                //TransPosition *p = &transpositTable[(zobrist & TPMask)];
+                p->L_hash = zobrist >> 32;
+                p->value = bestScore;
+                p->depth = depth;
+                p->state = TransPosition::FailHigh;
+#endif
 				return bestScore;
 			}
-			n = max(alpha, bestScore) + 1; // set up a null window
+			n = max(alpha, bestScore) + 1; // Set up a null window
         }
     }
-	if (!accCnt) {
-		//pv.count = 0;
-#ifdef PERFECT_ENDGAME_PV
-		return -CHECKMATE - 10 * depth;
+	if (accCnt == 0) {
+#ifdef BEST_ENDGAME_SEARCH
+		bestScore = -CHECKMATE - 10 * depth;
 #else
-		return -CHECKMATE;
+		bestScore = -CHECKMATE;
 #endif
 	}
-	Observer::scoutSearchBranch += accCnt;
+	Observer::data[Observer::DataType::scoutSearchBranch] += accCnt;
+
+#ifndef TRANSPOSITION_DISABLE
+    //TransPosition *p = &transpositTable[(zobrist & TPMask)];
+    p->L_hash = zobrist >> 32;
+    p->value = bestScore;
+    p->depth = depth;
+    if (bestScore <= origin_alpha) {
+        p->state = TransPosition::Unknown;
+    }
+    // 此處不會發生
+    /*else if (bestScore >= beta) {
+        p->state = TransPosition::FailHigh;
+    }*/
+    else {
+        p->state = TransPosition::Exact;
+    }
+#endif
     return bestScore;
 }
 
 int QuiescenceSearch(Board& board, int alpha, int beta) {
-	Observer::totalNode++;
-	Observer::quiesNode++;
+	Observer::data[Observer::DataType::totalNode]++;
+	Observer::data[Observer::DataType::quiesNode]++;
 
-    //int bestScore = board.Evaluate();
-    //if (bestScore >= beta) return bestScore;
+    int bestScore = board.Evaluate();
+    if (bestScore >= beta) return bestScore;
 
-	int bestScore = -CHECKMATE;
+	//int bestScore = -CHECKMATE;
     int n = beta;
 	U32 accCnt = 0;
 
@@ -129,20 +185,23 @@ int QuiescenceSearch(Board& board, int alpha, int beta) {
 				continue;
 			}
 
-			/* Search Depth */
-			board.DoMove(moveList[j]);
-			int score = -QuiescenceSearch(board, -n, -max(alpha, bestScore));
-			if (score > bestScore) {
-				if (score >= beta || n == beta)
-					bestScore = score;
-				else
-					bestScore = -QuiescenceSearch(board, -beta, -score + 1);
-			}
-			board.UndoMove();
-			if (bestScore >= beta) {
-				return bestScore; // cut off
-			}
-			n = max(alpha, bestScore) + 1; // set up a null window
+            if (SEE(board, ACTION_TO_DSTINDEX(moveList[j])) >= 0) {
+                /* Search Depth */
+                board.DoMove(moveList[j]);
+
+                int score = -QuiescenceSearch(board, -n, -max(alpha, bestScore));
+                if (score > bestScore) {
+                    if (score >= beta || n == beta)
+                        bestScore = score;
+                    else
+                        bestScore = -QuiescenceSearch(board, -beta, -score + 1);
+                }
+                board.UndoMove();
+                if (bestScore >= beta) {
+                    return bestScore; // cut off
+                }
+                n = max(alpha, bestScore) + 1; // set up a null window
+            }
 		}
 	}
     /*U32 cnt = 0;
@@ -165,10 +224,10 @@ int QuiescenceSearch(Board& board, int alpha, int beta) {
     return bestScore;
 }
 
-
 int SEE(const Board &board, int dstIndex) {
     int exchangeScore = CHESS_SCORE[board.board[dstIndex]];
-    vector<int> myMoveChess, opMoveChess;
+    int my = 0, op = 0;
+    int myMoveChess[8], opMoveChess[8];
 
     // [ Start Add opMoveChess ]
     const U32 psbboard = (RookMove(board, dstIndex) | BishopMove(board, dstIndex));
@@ -178,9 +237,9 @@ int SEE(const Board &board, int dstIndex) {
         U32 attsrc = BitScan(srcboard);
         srcboard ^= 1 << attsrc;
         if (Movable(board, attsrc) & dstboard)
-            opMoveChess.push_back(CHESS_SCORE[board.board[attsrc]]);
+            opMoveChess[op++] = CHESS_SCORE[board.board[attsrc]];
     }
-    if (opMoveChess.size() == 0) return board.GetTurn() ? -exchangeScore : exchangeScore;
+    if (op == 0) return board.GetTurn() ? -exchangeScore : exchangeScore;
     // [ End Add opMoveChess ]
 
     // [ Start myMoveChess ]
@@ -190,45 +249,123 @@ int SEE(const Board &board, int dstIndex) {
         U32 attsrc = BitScan(srcboard);
         srcboard ^= 1 << attsrc;
         if (Movable(board, attsrc) & dstboard)
-            myMoveChess.push_back(CHESS_SCORE[board.board[attsrc]]);
+            myMoveChess[my++] = CHESS_SCORE[board.board[attsrc]];
     }
-    if (myMoveChess.size() == 0) return board.GetTurn() ? -exchangeScore : exchangeScore;
+    if (my == 0) return board.GetTurn() ? -exchangeScore : exchangeScore;
     // [ End myMoveChess ]
 
     // [ Start sort ]
-    sort(opMoveChess.begin(), opMoveChess.end(), [](const int &a, const int &b) { return abs(a) < abs(b); });
-    sort(myMoveChess.begin(), myMoveChess.end(), [](const int &a, const int &b) { return abs(a) < abs(b); });
+    sort(opMoveChess, opMoveChess + op, [](const int &a, const int &b) { return abs(a) < abs(b); });
+    sort(myMoveChess, myMoveChess + my, [](const int &a, const int &b) { return abs(a) < abs(b); });
     // [ End sort ]
 
-    std::vector<int>::iterator op = opMoveChess.begin();
-    std::vector<int>::iterator my = myMoveChess.begin();
-    for (; op != opMoveChess.end(); op++) {
-        exchangeScore += *my;
-        if (++my != myMoveChess.end())
-            exchangeScore += *op;
+    for (int op_i = 0, my_i = 0; op_i < op;) {
+        exchangeScore += myMoveChess[my_i++];
+        if (my_i < my)
+            exchangeScore += opMoveChess[op_i++];
         else break;
     }
     // debug 用
-    /*if (opMoveChess.size() > 2 && myMoveChess.size() > 2) {
+    /*if (op > 2 && my > 2) {
     board.PrintChessBoard();
-    cout << " to: " << dstIndex << " see: " << (board.GetTurn() ? -exchangeScore : exchangeScore) << endl;
+    cout << " to: " << dstIndex << " see: " << (board.GetTurn() ? -exchangeScore : exchangeScore) << endl << "my: ";
+    for (int m : myMoveChess)
+        cout << m << ", ";
+    cout << endl << "op: ";
+    for (int op : opMoveChess)
+        cout << op << ", ";
+    cout << endl;
     system("pause");
     }*/
     return board.GetTurn() ? -exchangeScore : exchangeScore;
 }
 
-bool ReadTransposit(U32 hashcode, TranspositNode& bestNode) {
-	if (transpositTable.find(hashcode) != transpositTable.end()) {
-		bestNode = transpositTable[hashcode];
-		//TODO: if board.IsMovable(bestNode.bestAction) collision avoid
-		return true;
-	}
-	return false;
+void InitializeTP() {
+#ifndef TRANSPOSITION_DISABLE
+	transpositTable = new TransPosition[TPSize];
+	cout << "TransPosition Table Created. ";
+    cout << sizeof(TransPosition::L_hash) << " Bytes" << endl;
+    cout << sizeof(TransPosition::value) << " Bytes" << endl;
+    cout << sizeof(TransPosition::depth) << " Bytes" << endl;
+    cout << sizeof(TransPosition::state) << " Bytes" << endl;
+    cout << sizeof(TransPosition) << " Bytes" << endl;
+	cout << "Used Size : " << ((TPSize * sizeof(TransPosition)) >> 20) << "MiB\n";
+#else
+	cout << "TransPosition Table disable.\n";
+#endif
 }
 
-void UpdateTransposit(U32 hashcode, int score, bool isExact, U32 depth, Action action) {
-	map<U32, TranspositNode>::iterator it = transpositTable.find(hashcode);
-	if (it != transpositTable.end() && depth >= ACTION_TO_DEPTH(it->second.bestAction)) {
-		it->second = TranspositNode(score, isExact, depth, action);
+bool ReadTP(U64 zobrist, int depth, int& alpha, int& beta, int& value, const Board &board) {
+#ifndef TRANSPOSITION_DISABLE
+    TransPosition *p = &transpositTable[(zobrist & TPMask)];
+	if (p->L_hash != (zobrist >> 32)) {
+		Observer::data[Observer::DataType::indexCollisionNums]++;
+		return false;
 	}
+    /****** Debug *****/
+	/*if (transpositTable[index].evaluate != board.Evaluate()) {
+		Observer::data[Observer::DataType::evalCollisionNums]++;
+	}*/
+	/*for (int i = 0; i < 35; i++) {
+		if (p->board[i] != board.board[i]) {
+			Observer::data[Observer::DataType::evalCollisionNums]++;
+			return false;
+		}
+	}*/
+    /****** Debug *****/
+	if (p->depth < depth) {
+		return false;
+	}
+
+	Observer::data[Observer::DataType::totalTPDepth] += depth;
+	if (p->state == TransPosition::Unknown) {
+		/* Value在(-Infinity, value] */
+		beta = min(p->value, beta);
+		return false;
+	}
+	/* TODO : 需驗證 */
+	/*if (transpositTable[index].state == TranspositNode::Unknown && beta < transpositTable[index].value) {
+		beta = transpositTable[index].value;
+		return false;
+	}*/
+	if (p->value >= beta) {
+		/*自己發生Failed High*/
+		value = p->value; //beta;
+		return true;
+		//return false;
+	}
+	if (p->state == TransPosition::FailHigh) {
+		/*Failed-High*/
+		alpha = max(p->value, alpha);
+		return false;
+	}
+	/*Exact*/
+	value = p->value;
+	return true;
+#else
+	return false;
+#endif
+}
+
+void UpdateTP(U64 zobrist, int depth, int alpha, int beta, int value, const Board &board) {
+#ifndef TRANSPOSITION_DISABLE
+    TransPosition *p = &transpositTable[(zobrist & TPMask)];
+	p->L_hash = zobrist >> 32;
+	p->value = value;
+	p->depth = depth;
+	//Debug
+	//transpositTable[index].evaluate = board.Evaluate();
+	/*for (int i = 0; i < 35; i++)
+        p->board[i] = board.board[i];*/
+	//Debug
+	if (value < alpha) {
+        p->state = TransPosition::Unknown;
+	}
+	else if (value >= beta) {
+        p->state = TransPosition::FailHigh;
+	}
+	else {
+        p->state = TransPosition::Exact;
+	}
+#endif
 }

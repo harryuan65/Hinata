@@ -159,6 +159,7 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="head.h" />
     <ClInclude Include="library.h" />
+    <ClInclude Include="Zobrist.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveGene.cpp" />
     <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="Zobrist.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
