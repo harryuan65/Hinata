@@ -13,8 +13,8 @@ const U64 TPSize = 0x0000000001000000ULL;
 const U64 TPMask = 0x0000000000ffffffULL;
 //const int TPLimit = 3;
 
-//#pragma pack(push)
-//#pragma pack(1)
+#pragma pack(push)
+#pragma pack(1)
 struct TransPosition {
 	U32 L_hash = 0;    //4Bytes
     //Action action = 0; //4Bytes
@@ -30,7 +30,7 @@ struct TransPosition {
 	//short evaluate;
 	//BYTE board[35];
 };
-//#pragma pack(pop)
+#pragma pack(pop)
 
 void InitializeTP();
 bool ReadTP(U64 zobrist, int depth, int& alpha, int& beta, int& value, const Board &board);
