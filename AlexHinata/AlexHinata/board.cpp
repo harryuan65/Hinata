@@ -165,7 +165,7 @@ void Board::DoMove(const Action action) {
 
     recordAction[m_step++] = (dstChess << 18) | (srcChess << 12) | action;
     recordZobrist[m_step] = m_hashcode;
-    recordScore[m_step] = m_evaluate;
+    recordScore[m_step] = m_evaluate; // + rand() & 31 - 16;
     m_turn ^= 1;
 }
 

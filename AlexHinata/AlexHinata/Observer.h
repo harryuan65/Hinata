@@ -13,7 +13,6 @@ namespace Observer {
 		scoutSearchBranch,
 		totalTPDepth,
 		indexCollisionNums,
-		evalCollisionNums,
 		COUNT
 	};
 
@@ -88,7 +87,7 @@ namespace Observer {
 		os << " Avg scout search branch : " << setw(13) << (float)data[DataType::scoutSearchBranch] / data[DataType::scoutGeneNums] << "\n";
 		os << " Total TP Depth          : " << setw(10) << data[DataType::totalTPDepth] << "\n";
 		os << " Index Collision nums    : " << setw(10) << data[DataType::indexCollisionNums] << "\n";
-		os << " Eval Collision nums     : " << setw(10) << data[DataType::evalCollisionNums] << "\n";
+        os << " Hit rate                : " << setw(13) << 100.0 - (100.0 * data[DataType::indexCollisionNums] / data[DataType::totalNode]) << " %\n";
 		os << " Search time             : " << setw(13) << searchTime << "\n";
 		os << endl;
 	}
@@ -114,7 +113,7 @@ namespace Observer {
 		os << " Avg scout search branch : " << setw(13) << (float)game_data[DataType::scoutSearchBranch] / game_data[DataType::scoutGeneNums] << "\n";
 		os << " Total TP Depth          : " << setw(10) << game_data[DataType::totalTPDepth] / searchNum << "\n";
 		os << " Index Collision nums    : " << setw(10) << game_data[DataType::indexCollisionNums] / searchNum << "\n";
-		os << " Eval Collision nums     : " << setw(10) << game_data[DataType::evalCollisionNums] / searchNum << "\n";
+        os << " Hit rate                : " << setw(13) << 100.0 - 100.0 * game_data[DataType::indexCollisionNums] / game_data[DataType::totalNode] << " %\n";
 		os << " Search time             : " << setw(13) << game_searchTime / searchNum << "\n";
 		os << endl;
 	}

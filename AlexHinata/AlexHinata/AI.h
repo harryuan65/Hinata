@@ -8,10 +8,10 @@ int NegaScout(PV &pv, Board& board, int alpha, int beta, int depth, bool isFailH
 int QuiescenceSearch(Board& board, int alpha, int beta);
 int SEE(const Board &board, int dstIndex);
 
-/*    TransPosition Table    */ 
-const U64 TPSize = 0x0000000001000000ULL;
-const U64 TPMask = 0x0000000000ffffffULL;
-//const int TPLimit = 3;
+/*    TransPosition Table    */
+const U64 TPSize = 1 << ln_TPSize;
+const U64 TPMask = (TPSize >> 1) - 1;
+const U32 TPTurn = ln_TPSize - 1;
 
 #pragma pack(push)
 #pragma pack(1)

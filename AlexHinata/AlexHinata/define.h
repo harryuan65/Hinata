@@ -53,4 +53,7 @@ typedef unsigned __int32 Action;
 //#define IDAS_START_DEPTH 11
 //#define IDAS_END_DEPTH   10
 
+/*    TransPosition Table    */
+// Entries size: 2^26 = 64MB
+#define ln_TPSize 26
 #endif
